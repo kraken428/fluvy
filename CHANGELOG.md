@@ -5,6 +5,10 @@ and the versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.25.1] — 2026-11-23
+
+- Make the sidebar background transparent.
+
 ## [1.25.0] — 2026-11-23
 
 ### Visible on upgrade
