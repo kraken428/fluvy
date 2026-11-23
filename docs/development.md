@@ -42,7 +42,7 @@ pnpm build
 ```
 
 The bundle is one ES module, `fluvy.js`, that imports `chunks/core-<hash>.js` (everything a page needs) and fetches
-`chunks/{activity,history,details-history,panel,customise,sidebar-editor,pages,words,strategy,house-heights,wall,weather,calendar,media,chart,chart-card,energy-period,energy,history-bars-readings,devices,cameras-sheet,appliances,appliance-art,automations,automations-sheet,alerts,alerts-sheet,template,web,rounds,thermostats,rooms,about,expander,expander-editor,swipe,sidebar,slider,cover,vacuum,ring,vacuum-drive,climate,remote,app-logos,vehicle,schedule,schedule-sheet,details,items,items-sheet,lights-colour,light-colour,quick-actions,editor,fields,forms,view-icons,glass,quiet,thresholds,number-controls,slider-styles,switch-styles,background,dock,groups,icons,icons-appliances,icons-levels,icons-energy,icons-devices,icons-climate,icons-safety,icons-outdoor,icons-home,icons-rooms,levels,glyphs-rooms,shared,lang-*}-<hash>.js`
+`chunks/{activity,history,details-history,panel,customise,sidebar-editor,pages,words,strategy,house-heights,wall,weather,calendar,media,chart,chart-card,energy-period,energy,history-bars-readings,devices,cameras-sheet,appliances,appliance-art,automations,automations-sheet,alerts,alerts-sheet,template,web,rounds,thermostats,rooms,about,expander,expander-editor,swipe,sidebar,slider,cover,vacuum,ring,vacuum-drive,climate,remote,app-logos,vehicle,schedule,schedule-sheet,details,items,items-sheet,lights-colour,light-colour,quick-actions,editor,fields,forms,view-icons,glass,quiet,exact,thresholds,number-controls,slider-styles,switch-styles,background,dock,groups,icons,icons-appliances,icons-levels,icons-energy,icons-devices,icons-climate,icons-safety,icons-outdoor,icons-home,icons-rooms,levels,glyphs-rooms,shared,lang-*,shell-dialogs}-<hash>.js`
 on demand — the Activity page, the History page, our history in Home Assistant's details dialog (the first time a dialog
 shows it), the settings panel (and Customise, the first time one of its dashboards is customised; a dashboard's
 sidebar, the first time its section is opened), what they
@@ -65,7 +65,8 @@ fetch), the schedule sheet, the heating sheet, the alerts' sheet, the cameras' s
 own details sheets (the first time a card opens one), the
 light card's colour controls (the first colour bulb), the cards' visual editor, the fields every editor is built of
 (with the families too) and the forms of the cards every page carries (when a card is edited), what a see-through card wears (the first card under 100 %, or a house whose cards
-are see-through), what reads a card's thresholds (the first card that names one), what sets a number in place (the first card that asks for one), the slider styles (the first ruler asked for a bar, a liquid or a tile's fill, or a house that chose
+are see-through), the colours worn as they are named (the first card that asks, a house that asks, or the light card's
+colours), what reads a card's thresholds (the first card that names one), what sets a number in place (the first card that asks for one), the slider styles (the first ruler asked for a bar, a liquid or a tile's fill, or a house that chose
 one), the page's background (the first dashboard that wears one), a dashboard's own sidebar (the first dashboard whose
 configuration holds `fluvy_sidebar:`), the icon set's other parts (the index and each part, the first time Home
 Assistant asks for one of its icons), the levels in Fluvy's icons (a house that turns them on),
@@ -78,17 +79,17 @@ names its English part, or core keeps it, and every module no group names lands 
 (`vite.config.ts`) where core holds one that only the chunks fetched later reach. Lit is bundled, pinned to Home
 Assistant's version. `finish.mjs` writes
 `manifest.json` with every file's size and hash and a **build stamp**, and fails the build when the initial set goes
-over **236 KB gzip** or carries a family's English; `tools/release/check.mjs --release` holds every chunk to its own
+over **238 KB gzip** or carries a family's English; `tools/release/check.mjs --release` holds every chunk to its own
 budget (`BUDGETS`; the facts guard in `tools/docs` holds this table to it):
 
 | Script | Budget (gzip) | What it is |
 | --- | --- | --- |
 | `fluvy.js` | 2 KB | the entry |
-| `core` | 236 KB | what every page loads |
+| `core` | 238 KB | what every page loads |
 | `panel` | 44 KB | the settings panel and its English |
 | `customise` | 14 KB | Customise, the Dashboards tab's section that edits an automatic dashboard's views and cards, and its English: fetched the first time a dashboard is customised |
 | `sidebar-editor` | 6 KB | a dashboard's sidebar in the panel (1.21, #187), the Dashboards tab's section that writes `fluvy_sidebar:` without YAML, and its English: fetched the first time a dashboard's sidebar is opened |
-| `words` | 12 KB | the naming words: every language's, what the automatic dashboards read a house's names by, and the rule that reads a switch's name as a lamp's (1.23, #219), fetched with the strategy and by the first card asked for `lamp_switches` |
+| `words` | 13 KB | the naming words: every language's, what the automatic dashboards read a house's names by, and the rule that reads a switch's name as a lamp's (1.23, #219), fetched with the strategy and by the first card asked for `lamp_switches` |
 | `strategy` | 32 KB | the automatic dashboards: their views and cards, each card in a part with an id of its own, and a person's `edit` laid over them |
 | `house-heights` | 4 KB | the cards' heights counted with the house, for the automatic dashboards |
 | `wall` | 16 KB | wall mode |
@@ -100,7 +101,7 @@ budget (`BUDGETS`; the facts guard in `tools/docs` holds this table to it):
 | `media` | 16 KB | the player and the now-playing strip |
 | `devices` | 36 KB | the lock, the alarm and its keypad, the camera and the cameras, the printer, the job's times, the rows the lock, the alarm and the camera are built on |
 | `cameras-sheet` | 8 KB | the Cameras card's sheet |
-| `appliances` | 70 KB | the appliances family and its English |
+| `appliances` | 71 KB | the appliances family and its English |
 | `appliance-art` | 32 KB | the appliances' product drawings |
 | `automations` | 20 KB | the automations card, the schedule model and its store |
 | `automations-sheet` | 16 KB | the schedule sheet |
@@ -133,20 +134,22 @@ budget (`BUDGETS`; the facts guard in `tools/docs` holds this table to it):
 | `lights-colour` | 8 KB | the Room lights card's colour sheet and its hue wheel (#137), opened by the card's colour round |
 | `light-colour` | 8 KB | the light card's quick colours and hue ruler, and the quick colours' grammar its editor shares |
 | `quick-actions` | 5 KB | the rounds: a room's quick actions, the engine every card draws rounds with (their sets, levels, taps, holds and states) and the list row that ends in them (5 KB since 1.23: a card's control at its end, its chevrons, its rounds in columns) |
-| `weather` | 12 KB | the weather card |
+| `weather` | 14 KB | the weather card |
 | `calendar` | 16 KB | the calendar card: its views, what reads its events, its sheet |
 | `editor` | 8 KB | the cards' visual editor |
-| `fields` | 9 KB | the fields every card's editor is built of: the schema's helpers, a list's row form, the editors' English |
-| `forms` | 20 KB | the editors of the cards every page carries and of the template, Slider, Cover, Vacuum, Thermostat, remote and Heating schedule cards: their forms, lists and defaults |
+| `fields` | 10 KB | the fields every card's editor is built of: the schema's helpers, a list's row form, the editors' English |
+| `forms` | 22 KB | the editors of the cards every page carries and of the template, Slider, Cover, Vacuum, Thermostat, remote and Heating schedule cards: their forms, lists and defaults |
 | `view-icons` | 6 KB | a view's icon from its name |
 | `glass` | 4 KB | what a see-through card wears: its sheet's writer (every fill at its opacity) and its rules (its solid overlays, its blur) |
 | `quiet` | 4 KB | what a card quiet out of reach wears: the rules that give the unavailable skin's paint back, one sheet every such card adopts |
+| `exact` | 2 KB | the colours worn as they are named (1.25, #250): Home Assistant's own value for each of its colour names and the family a colour wears exactly; fetched by the first card that asks, its first frame waiting for it, or a house that asks, and with the light card's colours, whose bulbs glow those values |
 | `thresholds` | 2 KB | what reads a card's thresholds (1.22, #204): their values (a figure, an entity's reading, a template's answer), the band a reading is in and the stretches a chart colours; fetched by the first card that names one, its first frame waiting for it |
 | `number-controls` | 4 KB | what sets a number in place (1.23, #218): a row's value between − and + on the Entities card, a figure typed there and on the Helpers card, and their sheet; fetched by the first card that asks for one, its first frame waiting for it |
 | `slider-styles` | 4 KB | the slider styles (1.18, #144): the bar, the liquid and a tile's fill the ruler draws when asked, and their sheet; fetched by the first ruler asked for one, or as the house asks |
 | `switch-styles` | 4 KB | the switch styles (1.20, #177): the wall rocker a tile draws in its switch's place when asked, what a cover makes of it, and their sheet; fetched by the first tile asked for one |
 | `background` | 4 KB | the page's background (1.19, #155): the layer under a dashboard's view, its marks and its sheet; fetched by the first dashboard that wears one, or with the settings panel |
 | `dock` | 1 KB | this device's sidebar beside the page (1.20, #173): what answers the menus' asks; fetched on a device that chose it |
+| `shell-dialogs` | 1 KB | what Home Assistant's open dialogs paint (1.25, #242): fetched by `__fluvy.shell.dialogs()` in the console alone, never by a page |
 | `groups` | 4 KB | a list in groups (1.21, #189): the house's rooms and floors or a list's own sections under their labels, the short names inside a group, the scenes as chips; fetched by the first Tiles or Scenes card asked for groups, and with the automatic dashboards |
 | `icons` | 4 KB | the icon set's glyphs Fluvy's chrome never names (the garage, the gate, the window, the door open, the security camera, the open and reload arrows) and the index of its other parts |
 | `icons-appliances` | 4 KB | the icon set's appliances a person picks (`fluvy:washer`) |

@@ -283,6 +283,7 @@ describe('the vehicle card', () => {
         'binary_sensor.model_y_charge_cable': { state: 'off' },
         'switch.model_y_charge': { state: 'off' },
         'sensor.model_y_charger_power': { state: '0' },
+        'binary_sensor.model_y_tire_pressure_warning_rear_right': { state: 'off' },
       }),
     );
     const round = root(card).querySelector('.vh-control');
@@ -314,6 +315,7 @@ describe('the vehicle card', () => {
         'sensor.model_y_charging': { state: 'disconnected' },
         'binary_sensor.model_y_charge_cable': { state: 'off' },
         'sensor.model_y_charger_power': { state: '0' },
+        'binary_sensor.model_y_tire_pressure_warning_rear_right': { state: 'off' },
       }),
     );
     expect(text(root(card).querySelector('.vh-line'))).toBe('Cold inside · 2 °C');
@@ -391,6 +393,53 @@ describe('the vehicle card', () => {
     expect(src()).toBe('http://ha.example/api/b.png');
   });
 
+  it('draws its picture at its own size, its height following; the picture alone where nothing else shows (#254)', async () => {
+    const at = (config: Record<string, unknown>) =>
+      FluvyVehicleCard.layoutHeight({ type: 'x', ...config } as LovelaceCardConfig);
+    const image = '/local/car.png';
+    expect(at({ image, image_size: '50%' })).toBe(at({}) + 16 + 80);
+    expect(at({ image, image_size: '120px' })).toBe(at({}) + 16 + 120);
+    expect(at({ image, image_size: 96 })).toBe(at({}) + 16 + 96);
+    expect(at({ image, image_size: 'large' })).toBe(at({ image }));
+    expect(at({ image, image_size: '50%', image_position: 'head' })).toBe(at({}));
+    // the head hidden: its 44 and the 16 under it; the battery hidden, the line 16 under the head
+    expect(at({ show_head: false })).toBe(at({}) - 60);
+    expect(at({ show_hero: false })).toBe(at({}) - 156 + 8);
+    expect(at({ variant: 'compact', show_hero: false })).toBe(at({ variant: 'compact' }) - 36 + 8);
+    const alone = {
+      image,
+      show_head: false,
+      show_hero: false,
+      show_status: false,
+      show_controls: false,
+      show_rows: false,
+    };
+    expect(at(alone)).toBe(40 + 160);
+    expect(at({ ...alone, image_size: '50%' })).toBe(40 + 80);
+    expect(at({ ...alone, image: '' })).toBe(40);
+
+    const sized = await mount({ device: TESLA.device, image, image_size: '50%' });
+    const plate = root(sized).querySelector<HTMLElement>('.vh-picture')?.style;
+    expect([plate?.width, plate?.height]).toEqual(['160px', '80px']);
+    expect(root(sized).querySelector('.vh-picture .fv-tile__tap')).toBeNull();
+    document.body.replaceChildren();
+    const tall = await mount({ device: TESLA.device, image, image_size: '120px' });
+    expect(root(tall).querySelector<HTMLElement>('.vh-picture')?.style.height).toBe('120px');
+    expect(root(tall).querySelector<HTMLElement>('.vh-picture')?.style.width).toBe('320px');
+    document.body.replaceChildren();
+    // the picture alone is the card's button: its tap opens the battery, as the head's would
+    const card = await mount({ device: TESLA.device, ...alone, image_size: '60%' });
+    expect(sections(card)).toEqual(['span.vh-picture']);
+    const cover = root(card).querySelector<HTMLButtonElement>('.vh-picture > .fv-tile__tap');
+    expect(cover?.getAttribute('aria-label')).toBe('Model Y');
+    const opened: unknown[] = [];
+    const open = (event: Event) => opened.push((event as CustomEvent).detail.entityId);
+    window.addEventListener('hass-more-info', open);
+    cover?.click();
+    window.removeEventListener('hass-more-info', open);
+    expect(opened).toEqual(['sensor.model_y_battery_level']);
+  });
+
   it('draws its picture in the head, and a car glyph where none can be shown', async () => {
     const card = await mount({
       device: TESLA.device,
@@ -446,6 +495,388 @@ describe('the vehicle card', () => {
   it('says it has found no car, rather than draw an empty one', async () => {
     const card = await mount({ device: 'd-washer' });
     expect(root(card).querySelector('.fv-card--empty')).not.toBeNull();
+  });
+
+  it('writes its tyres in the decimals they share: their display precision, else one under 10, none above (#251)', async () => {
+    const pressures = async (hass: HomeAssistant, device = TESLA.device): Promise<string[]> => {
+      const card = await mount({ device, show_tyres: true }, hass);
+      const read = [...root(card).querySelectorAll('.vh-tyre')].map((tyre) => text(tyre));
+      document.body.replaceChildren();
+      return read;
+    };
+    // a bar's: 2.0 beside 2.3, never "2"
+    expect(
+      await pressures(house({ 'sensor.model_y_tire_pressure_front_left': { state: '2' } })),
+    ).toEqual(['2.0bar', '—', '—', '2.3bar']);
+    // a unit in another script reads as a bar does: by its figures
+    expect(
+      await pressures(
+        house({
+          'sensor.model_y_tire_pressure_front_left': {
+            state: '2.31',
+            attributes: { unit_of_measurement: 'бар' },
+          },
+        }),
+      ),
+    ).toEqual(['2.3бар', '—', '—', '2.3bar']);
+    // psi whole, but the sensor's own precision where Home Assistant's registry gives one
+    expect(
+      await pressures(
+        house({ 'sensor.ev6_tire_pressure_front_left': { state: '35.5' } }),
+        KIA.device,
+      ),
+    ).toEqual(['36psi', '—', '—', '—']);
+    const precise = house({ 'sensor.ev6_tire_pressure_front_left': { state: '35.5' } });
+    const entities = precise.entities as unknown as Record<string, Record<string, unknown>>;
+    entities['sensor.ev6_tire_pressure_front_left'] = {
+      ...entities['sensor.ev6_tire_pressure_front_left'],
+      display_precision: 1,
+    };
+    expect(await pressures(precise, KIA.device)).toEqual(['35.5psi', '—', '—', '—']);
+  });
+
+  it('finds a tyre low under its tyre_low: a figure, an entity in its own unit, a template once answered (#251)', async () => {
+    const calm = house({
+      'binary_sensor.model_y_tire_pressure_warning_rear_right': { state: 'off' },
+      'sensor.model_y_charging': { state: 'disconnected' },
+      'binary_sensor.model_y_charge_cable': { state: 'off' },
+      'sensor.model_y_charger_power': { state: '0' },
+    });
+    const states = calm.states as Record<string, HassEntity>;
+    states['sensor.tyre_threshold'] = {
+      entity_id: 'sensor.tyre_threshold',
+      state: '36',
+      attributes: { unit_of_measurement: 'psi' },
+    } as HassEntity;
+    const lowOf = async (tyre_low: unknown) => {
+      const card = await mount({ device: TESLA.device, show_tyres: true, tyre_low }, calm);
+      const read = {
+        low: [...root(card).querySelectorAll('.vh-tyre')].map((tyre) =>
+          tyre.classList.contains('is-low'),
+        ),
+        wheels: [...root(card).querySelectorAll('.vh-car rect.is-low')].length,
+        line: line(card),
+      };
+      document.body.replaceChildren();
+      return read;
+    };
+    const rearRight = { low: [false, false, false, true], wheels: 1, line: 'Low tyre pressure' };
+    expect(await lowOf(2.5)).toEqual(rearRight);
+    expect(await lowOf('2,5')).toEqual(rearRight);
+    // 36 psi is 2.48 bar: the rear right's 2.3 is under it, the front left's 2.9 is not
+    expect(await lowOf('sensor.tyre_threshold')).toEqual(rearRight);
+    // a template Home Assistant has not answered: no tyre is low yet
+    expect(await lowOf("{{ states('sensor.tyre_threshold') }}")).toEqual({
+      low: [false, false, false, false],
+      wheels: 0,
+      line: 'Unplugged · Limit 80 %',
+    });
+  });
+
+  it('lets the car from above give way, then puts each unit under its figure, as its column narrows', async () => {
+    // at 8 a letter "2.9" and "bar" side by side are 48 wide: a 360 card holds them beside the car, a 211 in two
+    // columns without it, a 172 (half a section) only with the unit under its figure
+    const layout = async (width: number): Promise<string[]> => {
+      const card = await mount({ device: TESLA.device, show_tyres: true }, house(), width);
+      (card as unknown as { head: { ruler: TextRuler } }).head.ruler.width = (
+        _: string,
+        text: string,
+        __?: string,
+        unit = '',
+      ) => (text.length + unit.length) * 8;
+      card.requestUpdate();
+      await card.updateComplete;
+      const classes = [...(root(card).querySelector('.vh-tyres')?.classList ?? [])];
+      document.body.replaceChildren();
+      return classes.filter((c) => c.startsWith('is-'));
+    };
+    expect(await layout(360)).toEqual([]);
+    expect(await layout(211)).toEqual(['is-bare']);
+    expect(await layout(172)).toEqual(['is-bare', 'is-stacked']);
+  });
+
+  it('writes its tyres in the decimals it asks for', async () => {
+    const card = await mount({ device: TESLA.device, show_tyres: true, tyre_decimals: '2' });
+    expect([...root(card).querySelectorAll('.vh-tyre')].map((tyre) => text(tyre))).toEqual([
+      '2.90bar',
+      '—',
+      '—',
+      '2.30bar',
+    ]);
+  });
+
+  it('says its integration’s tyre warning on its line, the tyres drawn or not', async () => {
+    const parked = {
+      'sensor.model_y_charging': { state: 'disconnected' },
+      'binary_sensor.model_y_charge_cable': { state: 'off' },
+      'sensor.model_y_charger_power': { state: '0' },
+    };
+    const card = await mount({ device: TESLA.device }, house(parked));
+    expect(line(card)).toBe('Low tyre pressure');
+    expect(root(card).querySelector('.vh-line.is-warning')).not.toBeNull();
+    document.body.replaceChildren();
+    const fine = await mount(
+      { device: TESLA.device },
+      house({
+        ...parked,
+        'binary_sensor.model_y_tire_pressure_warning_rear_right': { state: 'off' },
+      }),
+    );
+    expect(line(fine)).toBe('Unplugged · Limit 80 %');
+  });
+
+  it('draws its quick actions at its foot, each acting as a room’s does, the line declared by its config (#251)', async () => {
+    const quick = [
+      { entity: 'binary_sensor.model_y_status', name: 'GSM', icon: 'mdi:signal' },
+      'switch.model_y_sentry_mode',
+      'lights',
+    ];
+    const hass = house();
+    const card = await mount({ device: TESLA.device, quick_actions: quick }, hass);
+    expect(sections(card).at(-1)).toBe('div.vh-quick');
+    const rounds = root(card).querySelectorAll<HTMLElement>('.vh-quick .lt-bulb');
+    // a room's set means nothing on a car: its entities' rounds alone
+    expect([...rounds].map((round) => round.getAttribute('aria-label'))).toEqual([
+      'GSM',
+      'Model Y model y sentry mode',
+    ]);
+    // a sensor opens its details, a switch turns on and off
+    rounds[1]?.click();
+    expect(hass.calls.map(({ domain, service }) => `${domain}.${service}`)).toEqual([
+      'switch.turn_on',
+    ]);
+    expect((card as unknown as { watched(): string[] }).watched()).toContain(
+      'binary_sensor.model_y_status',
+    );
+    document.body.replaceChildren();
+    const said = await mount({
+      device: TESLA.device,
+      quick_actions: quick,
+      show_quick_states: true,
+    });
+    expect(root(said).querySelector('.vh-quick.is-under .rm-quick--under')).not.toBeNull();
+    document.body.replaceChildren();
+    const strip = await mount({ device: TESLA.device, variant: 'mini', quick_actions: quick });
+    expect(root(strip).querySelector('.vh-quick')).toBeNull();
+    const at = (config: Record<string, unknown>) =>
+      FluvyVehicleCard.layoutHeight({ type: 'x', ...config } as LovelaceCardConfig);
+    expect(at({ quick_actions: quick })).toBe(at({}) + 16 + 44);
+    expect(at({ quick_actions: quick, show_quick_states: true })).toBe(at({}) + 16 + 64);
+    expect(
+      at({ quick_actions: quick, show_quick_states: true, quick_state_position: 'beside' }),
+    ).toBe(at({}) + 16 + 44);
+    expect(at({ quick_actions: [{ entity: 'sensor.x', show_state: true }] })).toBe(at({}) + 80);
+    expect(at({ variant: 'compact', quick_actions: quick })).toBe(at({ variant: 'compact' }) + 60);
+    expect(at({ variant: 'mini', quick_actions: quick })).toBe(76);
+    expect(at({ quick_actions: [] })).toBe(at({}));
+  });
+
+  it('says a badge of the person’s own: words, an entity’s state, a template once answered; Unavailable first (#251)', async () => {
+    const badgeOf = async (
+      config: Record<string, unknown>,
+      hass: HomeAssistant = house(),
+    ): Promise<{ badge: string | null; strip: string }> => {
+      const card = await mount({ device: TESLA.device, ...config }, hass);
+      const badge = root(card).querySelector('.fv-badge');
+      document.body.replaceChildren();
+      const mini = await mount({ device: TESLA.device, variant: 'mini', ...config }, hass);
+      const strip = text(root(mini).querySelector('.fv-row__sub'));
+      document.body.replaceChildren();
+      return { badge: badge ? text(badge) : null, strip };
+    };
+    expect(await badgeOf({ badge: 'GPS ok · GSM 4/5' })).toEqual({
+      badge: 'GPS ok · GSM 4/5',
+      strip: '64 % · 320 km · GPS ok · GSM 4/5 · Home',
+    });
+    expect((await badgeOf({ badge: 'device_tracker.model_y_location' })).badge).toBe('Home');
+    // an entity out of reach, or an empty answer: the card says what the car does
+    expect(
+      (
+        await badgeOf(
+          { badge: 'device_tracker.model_y_location' },
+          house({ 'device_tracker.model_y_location': { state: 'unavailable' } }),
+        )
+      ).badge,
+    ).toBe('Charging · 7.2 kW');
+    expect((await badgeOf({ badge: ' ' })).badge).toBe('Charging · 7.2 kW');
+    // a template Home Assistant has not answered: no badge yet, rather than the card's for a moment
+    expect(await badgeOf({ badge: "{{ 'GPS ok' }}" })).toEqual({
+      badge: null,
+      strip: '64 % · 320 km · Home',
+    });
+    expect((await badgeOf({ badge: 'GPS ok' }, house(away(TESLA)))).badge).toBe('Unavailable');
+  });
+
+  it('starts and stops an engine named by hand, asking first both ways unless it says not to (#248)', async () => {
+    const asked: unknown[] = [];
+    const listen = (event: Event) => asked.push((event as CustomEvent).detail.config.tap_action);
+    document.body.addEventListener('hass-action', listen);
+    const engine = (state: string, domain = 'switch'): HomeAssistant & { calls: Calls } => {
+      const hass = house();
+      const id = `${domain}.model_y_engine`;
+      (hass.states as Record<string, HassEntity>)[id] = {
+        entity_id: id,
+        state,
+        attributes: { friendly_name: 'Model Y Engine' },
+      } as HassEntity;
+      return hass;
+    };
+    const roles = (domain = 'switch') => [{ role: 'engine', entity: `${domain}.model_y_engine` }];
+    try {
+      // named, it stands after the lock where the card names no controls of its own
+      const off = await mount({ device: TESLA.device, roles: roles() }, engine('off'));
+      expect(words(off).slice(0, 2)).toEqual(['Locked', 'Off']);
+      expect(labels(off)[1]).toBe('Engine · Off');
+      root(off).querySelectorAll<HTMLButtonElement>('.vh-control')[1]?.click();
+      document.body.replaceChildren();
+      const running = await mount(
+        { device: TESLA.device, roles: roles(), controls: ['engine'] },
+        engine('on'),
+      );
+      expect(words(running)).toEqual(['Running']);
+      expect(root(running).querySelector('.vh-control .fv-ico--accent')).not.toBeNull();
+      root(running).querySelector<HTMLButtonElement>('.vh-control')?.click();
+      document.body.replaceChildren();
+      const button = await mount(
+        { device: TESLA.device, roles: roles('button'), controls: ['engine'] },
+        engine('unknown', 'button'),
+      );
+      expect(words(button)).toEqual(['Engine']);
+      root(button).querySelector<HTMLButtonElement>('.vh-control')?.click();
+      expect(asked).toEqual([
+        expect.objectContaining({
+          perform_action: 'switch.turn_on',
+          confirmation: { text: 'Start the engine?' },
+        }),
+        expect.objectContaining({
+          perform_action: 'switch.turn_off',
+          confirmation: { text: 'Stop the engine?' },
+        }),
+        expect.objectContaining({
+          perform_action: 'button.press',
+          confirmation: { text: 'Start the engine?' },
+        }),
+      ]);
+      document.body.replaceChildren();
+      const hass = engine('off');
+      const quiet = await mount(
+        { device: TESLA.device, roles: roles(), controls: [{ control: 'engine', confirm: false }] },
+        hass,
+      );
+      root(quiet).querySelector<HTMLButtonElement>('.vh-control')?.click();
+      expect(hass.calls).toEqual([
+        { domain: 'switch', service: 'turn_on', target: { entity_id: 'switch.model_y_engine' } },
+      ]);
+    } finally {
+      document.body.removeEventListener('hass-action', listen);
+    }
+  });
+
+  it('draws an entity of the person’s own among its controls, in the car’s cell, its name its word (#248)', async () => {
+    const hass = house();
+    const card = await mount(
+      {
+        device: TESLA.device,
+        controls: [
+          'lock',
+          { entity: 'switch.model_y_sentry_mode', name: 'Guard', icon: 'mdi:shield-car' },
+          'cover.model_y_windows',
+          // the editor's own word for one of the person's own
+          { control: 'entity', entity: 'switch.model_y_charge', name: 'Charger' },
+        ],
+      },
+      hass,
+    );
+    expect(labels(card)).toEqual([
+      'Lock · Locked',
+      'Guard · Off',
+      'Model Y model y windows · Closed',
+      'Charger · On',
+    ]);
+    const word = root(card).querySelectorAll('.vh-control__word')[1];
+    expect(word?.classList.contains('is-name')).toBe(true);
+    expect(word?.hasAttribute('data-name')).toBe(true);
+    // a switch turns on and off at once, as a room's quick action does; a cover opens
+    const rounds = root(card).querySelectorAll<HTMLButtonElement>('.vh-control');
+    rounds[1]?.click();
+    rounds[2]?.click();
+    expect(hass.calls.map(({ domain, service }) => `${domain}.${service}`)).toEqual([
+      'switch.turn_on',
+      'cover.open_cover',
+    ]);
+    expect((card as unknown as { watched(): string[] }).watched()).toContain(
+      'switch.model_y_sentry_mode',
+    );
+  });
+
+  it('asks before an entity of the person’s own acts where it says so, never before its details open', async () => {
+    const asked: unknown[] = [];
+    const opened: unknown[] = [];
+    const listen = (event: Event) => asked.push((event as CustomEvent).detail.config.tap_action);
+    const open = (event: Event) => opened.push((event as CustomEvent).detail.entityId);
+    document.body.addEventListener('hass-action', listen);
+    window.addEventListener('hass-more-info', open);
+    try {
+      const hass = house();
+      const card = await mount(
+        {
+          device: TESLA.device,
+          controls: [
+            { entity: 'switch.model_y_sentry_mode', confirm: true },
+            { entity: 'sensor.model_y_odometer', confirm: true },
+          ],
+        },
+        hass,
+      );
+      const rounds = root(card).querySelectorAll<HTMLButtonElement>('.vh-control');
+      rounds[0]?.click();
+      rounds[1]?.click();
+      expect(asked).toEqual([
+        expect.objectContaining({ perform_action: 'switch.turn_on', confirmation: true }),
+      ]);
+      expect(opened).toEqual(['sensor.model_y_odometer']);
+      expect(hass.calls).toEqual([]);
+    } finally {
+      document.body.removeEventListener('hass-action', listen);
+      window.removeEventListener('hass-more-info', open);
+    }
+  });
+
+  it('counts the person’s own controls in its rows, their names never widening a cell', async () => {
+    // at 7 a letter a 300 card's 260 holds four cells of 65: a long name is cut, the car's own words decide the row
+    const card = await mount(
+      {
+        device: TESLA.device,
+        controls: [
+          'lock',
+          'climate',
+          { entity: 'switch.model_y_sentry_mode', name: 'A name far too long for its cell' },
+          'trunk',
+          { entity: 'cover.model_y_windows' },
+        ],
+      },
+      house(),
+      300,
+      7,
+    );
+    expect(root(card).querySelectorAll('.vh-control')).toHaveLength(5);
+    expect(
+      (root(card).querySelector('.vh-controls') as HTMLElement).style.getPropertyValue('--vh-cols'),
+    ).toBe('3');
+  });
+
+  it('reads roles written as a map as the list it means, and the editor shows them so (#251)', async () => {
+    const card = await mount({
+      device: TESLA.device,
+      scan: false,
+      roles: { battery: 'sensor.model_y_battery_level', lock: 'lock.model_y_lock', x: 4 },
+    });
+    expect(gauges(card)[0]?.figure).toBe('64%');
+    expect(words(card)).toEqual(['Locked']);
+    expect((card as unknown as { config: { roles: unknown } }).config.roles as unknown[]).toEqual([
+      { role: 'battery', entity: 'sensor.model_y_battery_level' },
+      { role: 'lock', entity: 'lock.model_y_lock' },
+    ]);
   });
 });
 
@@ -672,5 +1103,37 @@ describe('a car that burns fuel (#207)', () => {
     expect(at({ energy: 'hybrid', hero: 'ring' })).toBe(at({ energy: 'hybrid' }));
     expect(at({ energy: 'hybrid', variant: 'compact' })).toBe(at({ variant: 'compact' }) + 28);
     expect(at({ energy: 'hybrid', variant: 'mini' })).toBe(76);
+  });
+});
+
+describe('the controls in the editor (#248)', () => {
+  it('reads an entity of the person’s own as the picker’s own word, and writes it back as its entity', async () => {
+    const { lists } = await import('./vehicle-editor.js');
+    const controls = lists.find((list) => list.key === 'controls');
+    const read = (raw: unknown) => controls?.read?.(raw);
+    const write = (item: Record<string, unknown>) => controls?.write?.(item);
+    expect(read('lock')).toEqual({ control: 'lock' });
+    expect(read('switch.haval_engine')).toEqual({
+      control: 'entity',
+      entity: 'switch.haval_engine',
+    });
+    expect(read({ entity: 'switch.haval_engine', name: 'Engine' })).toEqual({
+      control: 'entity',
+      entity: 'switch.haval_engine',
+      name: 'Engine',
+    });
+    expect(
+      write({ control: 'entity', entity: 'switch.haval_engine', name: '', confirm: true }),
+    ).toEqual({ entity: 'switch.haval_engine', confirm: true });
+    // picked, before its entity is: kept in the list
+    expect(write({ control: 'entity' })).toEqual({ control: 'entity' });
+    expect(write({ control: 'trunk', name: 'Tailgate', icon: '' })).toEqual({
+      control: 'trunk',
+      name: 'Tailgate',
+    });
+    const fields = (item: Record<string, unknown>) =>
+      JSON.stringify(controls?.schemaOf?.(item)).match(/"name":"\w+"/g);
+    expect(fields({ control: 'entity' })).toContain('"name":"entity"');
+    expect(fields({ control: 'lock' })).not.toContain('"name":"entity"');
   });
 });

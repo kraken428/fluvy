@@ -13,7 +13,7 @@ Every screen — our cards and every Home Assistant page under the theme — is 
 3. **Aligned text.** Readout rows centred; labels and values on shared baselines; nothing drifts to the left of its column.
 4. **Uniform spacing.** One rhythm between siblings (4 px grid; 8 / 12 / 16 / 24 steps); no two fields touching, no uneven gaps in a stack.
 5. **Chip rows fill.** A horizontal row of chips or options occupies its row — equal widths or distributed — and leaves no empty tail. (A scrolling strip that overflows on purpose, such as view tabs, is exempt.)
-6. **Text stays inside.** Ellipsis for names, wrap for prose; values never ellipsise, never overflow or clip. Japanese prose wraps between its phrases, never inside a word (スケジュールを / 追加, not 追 / 加): `word-break: auto-phrase` on every Fluvy element whose language is Japanese (Home Assistant writes its language on `<html>`), where the browser knows the phrases (Chromium 119+); every other language wraps as it did, Chinese between any two characters, as it is set. Simplified Chinese draws its Han in a Simplified face (PingFang SC, Microsoft YaHei, Noto Sans SC), named before the system's own on every Fluvy element whose language is `zh-Hans`; its Latin letters and figures stay Inter's.
+6. **Text stays inside.** Ellipsis for names, wrap for prose; values never ellipsise, never overflow or clip. Japanese prose wraps between its phrases, never inside a word (スケジュールを / 追加, not 追 / 加): `word-break: auto-phrase` on every Fluvy element whose language is Japanese (Home Assistant writes its language on `<html>`), where the browser knows the phrases (Chromium 119+); every other language wraps as it did, Chinese between any two characters, as it is set. Simplified Chinese draws its Han in a Simplified face (PingFang SC, Microsoft YaHei, Noto Sans SC), named before the system's own on every Fluvy element whose language is `zh-Hans`, and Traditional Chinese in a Traditional one in Taiwan's forms (PingFang TC, Microsoft JhengHei, Noto Sans TC) where it is `zh-Hant`; their Latin letters and figures stay Inter's.
 7. **Clean motion.** Short, purposeful transitions (transform and opacity only), no jank, nothing replayed on a view change.
 8. **Pixel alignment.** Edges, centres and baselines line up to the pixel across a row and down a column.
 
@@ -368,7 +368,7 @@ Rectangular tappables share **one radius: 12** (option tiles, buttons, keys, fie
 - **Quick search and pickers:** section chips on the page fill without separators (in the quick bar, five equal whole-pixel cells from 601), section titles as the cards' labels (11/600 caps, no grey band), rows of two lines at 60 (14/20 over 13/16), every glyph in our 40 icon circle on the accent fill instead of Home Assistant's brand colours, the tip 13/500 with its link in the accent.
 - **Home Assistant's own Material icons (2026-09-19):** the chrome's icons (`ha-svg-icon`, told only a path: undo, redo, help, the ⋮ menu and its items, pencils, close, back arrows, search, copy, delete…) are drawn as our glyphs while the shell is on and the house keeps our icons: a table of 32-bit keys of the Material paths (`tools/icons/mdi-glyphs.json` → `packages/core/src/icons/mdi.ts`, `@mdi/js` pinned to Home Assistant's 7.4.47, only for the generator) tells which glyph replaces each; the Material path is kept on the element and comes back when the icons are switched off or another theme is worn.
 - **A dashboard in edit mode:** the edit bar keeps its accent fill, everything on it in the bar's ink; Done is the primary action (36, the tappable radius, never shrunk); the open view is a tile on the card fill holding its arrows and pencil (no underline); frames of what can be edited are a fine dashed hairline; what adds (a title, a badge, a card, a section) is a fine dashed accent outline filling with the accent's wash; what edits is a quiet control on the card fill with a hairline.
-- **All of Home Assistant under the theme (exploration of 2026-09-18):** the theme maps HA's whole colour system, not only the accent — the named palette (`--amber-color`… 21 names, which every per-domain state colour, timeline, logbook dot and 2026 summary resolves through), the success / warning / danger scales (`--ha-color-green|orange|red-05…95` from our status inks), off as the quiet strong hairline, weather glyphs, outlines, the edit-mode header (the accent fill), the code editor's syntax (keys accent, values ink, figures info, punctuation disabled). Type: HA's "bold" is our 600, font sizes keep `--ha-font-size-scale`, the old Material components get Inter without tracking (`--mdc-typography-*` from the shell's page sheet, not the theme: 2026.10 retires those names), HA tiles take the compact tile's 15/600 over 13/500. The shell registry then gives every HA component class its idiom: data tables (14/20 cells, 13/600 secondary headers, 36 toolbar controls), search boxes (card-white 12-radius field), menus, tabs on whole pixels, dialog titles 600 with an ellipsis, alerts as status panels (role fill, radius 12), option boxes as tiles, button toggle groups as a segmented track, section and card titles 20/600, card actions on the content column, empty states, Leaflet controls, logbooks that open instead of scrolling inside a scrolling surface, the automation editor (headings, rows, side panel, targets), and the charts' canvas font (the one wrapped builder). a shell health check (see `docs/shell.md`) lists which sheets HA still draws after an update.
+- **All of Home Assistant under the theme (exploration of 2026-09-18):** the theme maps HA's whole colour system, not only the accent — the named palette (`--amber-color`… 21 names, which every per-domain state colour, timeline, logbook dot and 2026 summary resolves through), the success / warning / danger scales (`--ha-color-green|orange|red-05…95` from our status inks), off as the quiet strong hairline, weather glyphs, outlines, the edit-mode header (the accent fill), the code editor's syntax (keys accent, values ink, figures info, punctuation disabled). Type: HA's "bold" is our 600, font sizes keep `--ha-font-size-scale`, the old Material components get Inter without tracking (`--mdc-typography-*` from the shell's page sheet, not the theme: 2026.10 retires those names), HA's tiles keep HA's own type, 14/500 over 12/400 at the user's text size (`--ha-font-size-scale`), in Inter without tracking (1.25, #240: our compact tile's 15/600 over 13/500 cut their names short). The shell registry then gives every HA component class its idiom: data tables (14/20 cells, 13/600 secondary headers, 36 toolbar controls), search boxes (card-white 12-radius field), menus, tabs on whole pixels, dialog titles 600 with an ellipsis, dialogs and bottom sheets on the look's plain colour with the theme's surface laid over it as an image (1.25, #242: a variable a device fails to resolve never leaves one see-through), the page's text at the size it is laid out in (`text-size-adjust: 100%` while Fluvy is in use, so Android's text autosizer never grows words past the boxes they were measured for), alerts as status panels (role fill, radius 12), option boxes as tiles, button toggle groups as a segmented track, section and card titles 20/600, card actions on the content column, empty states, Leaflet controls, logbooks that open instead of scrolling inside a scrolling surface, the automation editor (headings, rows, side panel, targets), and the charts' canvas font (the one wrapped builder). a shell health check (see `docs/shell.md`) lists which sheets HA still draws after an update.
 - **All of Home Assistant, second round (2026-09-18, night):** Inter is registered at start on every page (not when the first card appears) and inside every same-origin panel frame (HACS), which gets a shell of its own while the page wears Fluvy. HA's charts draw the canvas in the body font and a series HA paints in its own default primary in the page's primary (where Fluvy is in use). The empty-state idiom reaches HA through one shell helper (tables, "No activity found", the area page's lists, the To-do panel, the notifications drawer). A card head that carries icon buttons (the Activity card, the log cards) keeps the standard head line (12 · 34 · 16) and hangs the 48 buttons over it. Option choices in HA become our option tiles with their glyph (the profile's Auto · Light · Dark), view switches our segmented track (Daily / Hourly), paired footer actions one width (112). A required field without a hint keeps no empty row; HA's 10 px step is the 11 px floor. Page titles are 600 everywhere, inactive tabs take the secondary ink, and a tab strip keeps a fixed trailing slot so it never moves between sibling pages.
 - **Automatic dashboard:** `strategy: { type: custom:fluvy-home }` builds Home, Lights, Climate, Energy and Sensors from the registries and the energy preferences with the approved `/fluvy-home` layout: lights = `light.*` plus switches whose words say light, appliances = the other switches (one per device, twin outlets dropped) with their power and energy readings, climate = thermostats + weather + temperature/humidity sensors that are not the weather service's, energy = solar/grid/battery power by words + the energy dashboard's devices, sensors = device batteries, phones (mobile_app), people, openings, plants, updates. Names: the entity's own words, the device's name when the own words only say the kind, the area or the device for a reading's place. Capped lists (each with its "N more" row, below), empty sections and views left out, titles in the dashboard's language, `hide: [energy]` to drop a view.
 - **Capped lists (1.11.1, #78):** a view shows the first of a long list — lights 6, plug tiles 4, blinds 6, garage doors and gates 2, thermostats 4, fans 2, humidity 3, temperatures 4 (Climate's sensor cards) and 3 (the readouts of Home, the wall and a room), Home's security rows 5 (the wall's 6), alarms 2, locks 4, cameras 4 (the Security dashboard's Cameras view 12), players 6, calendars 3, to-do lists 3, timers 3, things to run 6, scenes 6, batteries 8, phones 8, plants 4, helpers 6, updates 8, the energy dashboard's devices 8 (its Devices view 12), the day's stat tiles 4, power meters 9, a room's other devices 8 (`caps.ts`) — and nothing past the cap is out of reach: the list ends with the house's fold row, "N more" (the `list` glyph in its neutral circle, "{count} more", the chevron; "+N" where the words would not hold beside the chevron), which opens a subview of every one, after the view's path (`climate-humidity`, `room-kitchen-lights`) and back to it, its heading the way back as a room's is. The row is the last row of a list of rows (the entities card's `more` and `more_path`) and a card of its own under a list of cards, kept under the list's last card (a block never splits; a loose card takes its row with it). The subview lays the whole cards of a list of cards over its columns, a list of rows a card a room (the biggest first, as the Security dashboard's Openings view), a run of readings three a card (four share one, two by two). One past the cap of a list of rows or tiles is shown instead, as every fold of the house: it takes the room the "1 more" row would. The Openings cards and a room's Automations card fold their own lists at the list's cap (openings 4, automations 6, as the card's `max_rows`; in full, every one), the rest a tap away on the card, no subview. A chart's series are never capped (the distribution's eight are the palette's), nor the picks of an overview (Home's running thermostat, its first player, vacuum, list and scene). The dashboard's `caps` raises a list's cap (`caps: { lights: 12 }`), lifts it (`humidity: none`), sets one for every list (`caps: 10`, or `all: 10` beside a list's own, which wins: 1.23, #231) or lifts them all (`caps: none`: every list whole, no row); the panel's Dashboards tab offers Long lists: Shortened (the default, writing nothing) · Up to… · In full, the number on the house's stepper (1 to 50, 10 when first chosen) in a 60 row under the chips while Up to… is chosen ("Up to 10 per list", the row's circle given to its words where they would not hold beside the stepper at 50), and a raw configuration's own numbers read as Shortened (Up to… beside an `all`) and stay until In full is chosen. Home's appliance bands keep their own rows whatever it says.
@@ -732,6 +732,33 @@ column holds it, the ruler lit from the top down to the knob, `origin` 100). Num
 commands are Home Assistant's. `open_label` and `closed_label` name the position ruler's ends; a word of the person's
 longer than the ends' 56 ends in an ellipsis.
 
+## The cover across (1.25, #244)
+
+The Cover card's position on one row, asked for (`variant: horizontal`; `full` stays the default): the reporter's
+mockup reproduced in the house's forms, the head as every cover's (the circle and its glyph, the name, the room and the
+kind, the state's badge).
+
+- **The row**, 24 under the head: the position's readout at the left in a column as wide as its widest figure (100 %,
+  "down" after it where the cover is counted so) or its label, on the 4 grid, and the house's ruler 24 beside it
+  taking the rest of the card, band 44, in the house's slider style (`ruler`, `bar`, `liquid`), its knob the ruler's
+  ring and dot. The ends' words stand over the ruler's ends ("Closed" at its start, "Open" at its end) on the readout
+  label's 16 line, in the ruler words' 11/500 ink; the figure sits 8 under its label, its 28 line centred on the
+  band (16 + 8 + 14 = 16 + 22), so the figure reads on the knob's centre line. The row is 60: the declared height is
+  228 at 360, by config alone, live or out of reach.
+- **Measured, never a threshold**: the ruler keeps 128 beside the readout (a pixel a percent between the knob's stops)
+  or the 24 closes to 16, then the word "down" gives way; where not even that holds (a narrow column, half a section),
+  the readout stands over the ruler at the card's width, the ends' words on their own line 16 under it. The
+  ends say their words where the ruler holds both 8 apart (the person's own words too, `open_label`, `closed_label`),
+  else their figures as the card counts them ("0 %", "100 %"; "100 %" at the closed end where it counts down); while
+  the fine scale is up, the figures it reads there. The ruler draws left to right whatever the page's direction, and
+  its words stand at its own ends.
+- **The commands** under the row, 16 apart from it, as the mockup draws them: equal outlined pills, the card's own fill
+  and its hairline (as a button on the page's ground stands), at the pill radius of the house's shape, the glyph in the
+  secondary ink; the hover, the press, the disabled look and the dashes out of reach are the button family's.
+- **The tilt** stands under the commands at the card's width: its readout and stepper, or its slats and their ruler
+  (§ The cover's tilt, `under`), its presets under it without a name; the position's presets follow the commands, the
+  favourites close the card, as on the full card. A cover with no position draws as the full card does.
+
 ## Clocks and calendar
 
 - Analog face = the ruler's ticks bent into a circle: majors R/10 in ink, minors R/20 in border-strong (majors only at R 56); hour hand 0.52 R inside the numerals, minute 0.85 R and second 0.88 R over the numerals to the tick ring, widths 6/4/2 (R ≥ 96) · 5/3/2 (72) · 4/3/2 (56), round caps; only the second hand carries a counterweight (cap radius + 8); the cap is the Fluvy knob without halo or lift, 28 / 20 / 16. Numerals 14/600 secondary at 0.75 R (12/600 at R 56). Plain clocks are accent; a weather clock takes the sky's tone (accent at night, solar by day). Digital time 64/72 at −0.03 em, tabular, ink pulled onto the column (−0.06 em, declared `data-align="optical"`); seconds or AM/PM as a 24 unit on the baseline; date 14/500 secondary — the full date in a 320 column, "Thu 17 Sep" in narrow columns and tiles.
@@ -930,14 +957,38 @@ longer than the ends' 56 ends in an ellipsis.
 ## Compass (1.23, #209, by @twodrops)
 
 A bearing on a 360° ring, drawn as Fluvy's dials are: the wind from a weather station, a car's heading, the sun's
-azimuth. One shape of its own, its arrow; every other part is a control the house already has, read.
+azimuth. Two shapes of its own, its arrow and its chevron, and a classic compass's bezel; every other part is a
+control the house already has, read.
 
 - **The ring** is the gauge's: R 96 from a 240 column, in a 240 box, down to the column's on the 4 grid (as the gauge,
-  `(width / 2 − 24)`), its ticks the dial's (2 px, round caps, the strong hairline; 12 long every 45°, 7.2 between,
-  every 5°, every 10° under R 64). The four cardinal points stand in their ticks' place, in the ticks' band, 11/600
-  tracked as a dial's label, the weather's words in the page's language, north in the text's ink and the others in the
-  secondary's; `north_offset` turns the ring (east at the top for a window facing east) and the letters stay upright.
-  Without ticks, a 2 px ring in the hairline is the knob's track.
+  `(width / 2 − 24)`). Its face (`face`) is a classic compass's by default, or 1.24's ring of ticks.
+- **The classic face** (1.25, #247, after @twodrops' own design): a bezel band 12 wide (6 under R 72) in the well's
+  quiet fill (`--fluvy-inset`, the page's colour on a plain card: the wash's deeper step on a washed one, see-through
+  on a see-through one), its outer edge 2 past the ring so the letters outside it keep the ring's box and the card is
+  as tall as with the ring; the ticks across it, hanging from its outer edge in the dial's 2 px round-capped strong
+  hairline, every 7.5° (three to a sixteenth, every 11.25° under R 56): the rest 5 long, every 22.5° 8, every 45°
+  across the band; each cardinal point's bar 3 bold, from the hairline (2 inside the band without one) to 2 past the
+  band toward its letter; on a large ring (from R 72) a 1 px hairline in the border round the open centre, 5 inside
+  the band (a smaller ring's centre has no room to spare for one). The four letters stand outside the band, 5 clear of
+  it where their box meets their bearing, upright wherever `north_offset` turns the ring, 16/700 (14 from R 40 to 56,
+  12 under), north in the card's ink and the others in the secondary's. They keep their column: the room from the
+  ring's centre to the column's nearer edge across (the ring's box beside a compact card's reading), the ring's box
+  down; a long word steps all four down together, 16 → 14 → 12 → 11 (Polish's "Wsch" holds at 16 in a desktop's
+  section, at 12 on a phone's), and where none holds (Polish in a narrow column) they stand in the band's place at
+  11/600 tracked, the band and its ticks giving way round each in arcs, as the ring's do. The pointers ride the band's
+  middle (4 inside the ring on a full one), a dot on it clearing the ticks under it as the arrow does, and lit ticks
+  span the band so the bearing's sixteenth reads as one arc. The open centre's lines are as wide as the dial's disc
+  holds and, here, as the circle inside the hairline (else the band) holds them where they stand, 3 clear: the word
+  over the figure and the line under it (43 from the middle on a large dial, 35 on a small one) and the figure's
+  digits (18, 12), so a long word leaves rather than runs into the band. Without ticks the band, the hairline and the
+  letters stay: a plain bezel.
+- **The ring of ticks** (`face: ring`, 1.24's look): the dial's ticks (2 px, round caps, the strong hairline; 12 long
+  every 45°, 7.2 between, every 5°, every 10° under R 64). The four cardinal points stand in their ticks' place, in
+  the ticks' band, 11/600 tracked as a dial's label, the weather's words in the page's language, north in the text's
+  ink and the others in the secondary's; `north_offset` turns the ring (east at the top for a window facing east) and
+  the letters stay upright. Without ticks, a 2 px ring in the hairline is the knob's track.
+- **The letters** are words laid over the drawing (each centred where it stands, `aria-hidden`: the line under the
+  figure says the bearing), so the measurer reads them as it reads every word: inside their card, over no other.
 - **The bearing** is marked by the compass's **arrow** (the default, 1.23 polish: "compasses usually have an arrow"): a
   compass needle's head, isosceles and slim, symmetric about its axis and of one ink, laid across the ring where the
   bearing is and pointing out from the centre to it, as a compass needle's head points on its ring (the owner's call,
@@ -952,10 +1003,15 @@ azimuth. One shape of its own, its arrow; every other part is a control the hous
   the short way round (350° to 10° is 20° clockwise) and settles there on the house's spring (640 ms; still under
   reduced motion). What it covers gives way, never cut: the ticks it would touch (4 clear of their lines) fade out and
   back as it leaves, and a cardinal point it stands on fades as well, as does a point under a knob's halo or a dot,
-  where the letters were cut before. Or a control read: the thermostat's **knob** riding the ring (36, 28 on a small
-  ring; its dot, its lift, its halo cutting the ticks), the ring's **ticks lit** across the bearing's sixteenth (11.25°
-  either side, the gauge's lit ticks, glowing in dark), or the dial's **dot** outside the ticks (3, as the thermostat's
-  current reading). A second bearing to compare against (a 10-minute average, the sun) is drawn under the first in the
+  where the letters were cut before. Or the **chevron** (1.25, #247, @twodrops' pointer in the house's idiom): the
+  knob's disc and 2 ring in the tone's ink (its size: 36, 28, 20) with a chevron of the same ink and stroke in it, 0.4
+  of the disc wide and 0.22 deep, pointing out or in as `arrow_points` says; it turns as the arrow does (the short way
+  round, on the spring), lifted as the knob is, its halo of the card (6 round its ring, a layer of its own under it,
+  turned with it) cutting the band and the ticks; the second's in the secondary ink and flat; in a row the chevron
+  alone across the track (8 wide, 5 deep), the circle having no room beside the row's. Or a control read: the
+  thermostat's **knob** riding the ring (36, 28 on a small ring; its dot, its lift, its halo cutting the ticks), the
+  ring's **ticks lit** across the bearing's sixteenth (11.25° either side, the gauge's lit ticks, glowing in dark), or
+  the dial's **dot** outside the ticks (3, as the thermostat's current reading; on the classic face's band). A second bearing to compare against (a 10-minute average, the sun) is drawn under the first in the
   secondary ink: a dot by default; its arrow, where it is asked for one, is the same head unnotched, its outline alone
   (1.5) and flat, never a second filled arrow beside the first (a notched outline is the paper plane again). Each
   pointer is a layer of its own over the ring, the second's under the first's. Nothing is marked where the bearing
@@ -975,7 +1031,8 @@ azimuth. One shape of its own, its arrow; every other part is a control the hous
   Spanish's West); it is said in the page's language, a point between two as the language joins them (`compass.point16`:
   "NNE", 北北東, "Pn-Pn-Wsch"); 359.6° is 0°.
 - **Layouts** (`variant`): `full` (the default, above); `compact`, the head, then a small ring at the column's start (R
-  28 in a 104 box, the arrow in a tile's 20 knob's place, its points in its ticks' band) with the readout 16 beside it —
+  28 in a 104 box, the arrow in a tile's 20 knob's place; a classic face's band 6 and its letters 12 outside it within
+  the ring's box, a ring's points in its ticks' band) with the readout 16 beside it —
   the word, the figure at the large readout's size where it holds, else the small one (the extra-small one before it
   would be cut), the point and the degrees under it on one line, the stack centred on the ring — the readout under the
   ring where the column does not leave it a room as wide as the ring beside it (under 224 of content: a phone's
@@ -1161,6 +1218,23 @@ azimuth. One shape of its own, its arrow; every other part is a control the hous
   says who), at 28 again where it fits; at 22; and last, where even that would be cut (a phone's column at the largest
   sizes), the language's short hello ("Hello", "Hallo", "Ciao"). The date and the weather give way under it as before.
 - **Whose greeting**: without a `person`, the signed-in user's person (name, picture, more-info); a `person` pins one.
+
+## Tabs on the page (1.25, #241)
+
+The chips card's tabs (§ Controls: tab rows) stand on the page beside the greeting; a wall's header holds four or five.
+
+- **Centred** (a fix): in a row that fills its line each tab's glyph and words stand in its middle, the fitted sides
+  dropped on both ends (they were dropped at the start only: every tab sat 8 left); words that render nothing (a
+  template's empty answer) draw no box, so the glyph alone is the content and no gap follows it; a glyph keeps its 20
+  in any pill, the words giving way.
+- **Its icon alone** (`show_name: false`, the card's or a tab's own): the glyph alone in the pill (20 + 32, on the 4
+  grid: 52), its name the button's, read aloud and shown under the pointer. A tab with no icon keeps its name.
+- **Plain** (`style: plain`, the card's or a tab's own; `pill` the default): no pill at rest, neither fill nor
+  hairline, the glyph and words in the page's inks (the secondary; the light ink on a deep background or a picture, as
+  the greeting's), a wash of that ink (10 %) under the pointer, where the words take the page's primary ink, and
+  under the finger. The open view keeps its pill (the ink pill, or its colour's fill), so the row still says where
+  you are. A colour at rest (`tint: always`) is the glyph and the words in its ink, no wash. Height 44, the 36 pill,
+  the 44 target and the focus ring are the pill's: only what is painted at rest goes.
 
 ## Dashboards (the panel's tab)
 
@@ -1419,6 +1493,10 @@ had always had it: it stands in Home Assistant's view row, under the header, and
   blurred as the house blurs.
 - **Never in the way.** The edit mode has none. A wall has it from the top of the screen. It stands inside the
   floating frame and after Home Assistant's own sidebar, grows with the device's size, and wears a view's theme.
+- **Its width** is px (160 to 560), a share of the dashboard (`24%`: of what Home Assistant's sidebar leaves) or,
+  since 1.25 (#249), a share of the screen (`25vw`: of the whole window, the same share at any of the device's sizes,
+  where its px grow with them); a share is held 10 to 50 and between 160 and 560 px. A phone keeps none unless its
+  own width is written.
 - **In the panel.** A dashboard's card in the Dashboards tab has a *Sidebar* row under *Customise* (the sidebar's
   glyph; the accent's circle once the dashboard has one, and its sub then says so), and the tab's first card an
   *Other dashboards* row where the house has dashboards of its own. The row opens a section in the tab's place, as
@@ -1428,7 +1506,9 @@ had always had it: it stands in Home Assistant's view row, under the header, and
   dashboard in small, 148 tall on the page's fill with the control's radius and the hairline: a header strip, the
   view as tiles, and the sidebar at its side as chosen (a panel to the picture's edges with one hairline, a card
   with the view's gap round it, or its blocks alone), its pages as three circles with a line each, the open one in
-  the accent, its head and foot as blocks. *Place* and *Cards* are ordinary cards of chips and switch rows; a
+  the accent, its head and foot as blocks. *Place* and *Cards* are ordinary cards of chips and switch rows (a
+  device's width two rows of chips under its label: its unit, px, % of the screen or % of the dashboard, then its
+  figures in that unit, None first; a unit chosen gives a quarter, px its device's own width); a
   list's cards are Home Assistant's stack editor, 12 under the hint, or its YAML field. A dashboard kept in a file
   gets a *YAML* card: the text on the inset fill in the mono face 13/20, selectable whole, and a quiet button that
   says it copied.
@@ -2688,8 +2768,8 @@ dashboards' bands — and change only their hero and their words.
   the palette shows whites, so a red bulb among them glows red where Home Assistant's own mean would wash it to a beige
   and its majority mode call it white), and, while a flip waits for Home Assistant, the colour it last glowed (kept for
   the page), so it never flashes the palette's light first. Glowing none, the palette's lit light
-  (`state['light-active']`, never the name amber, which is a near black on Noir). The icon circle, the switch and the
-  rulers take it through the lit-light family `data-accent` remaps; `compact` too.
+  (`state['light-active']`, the accent's twin, never the name amber, an amber of the palette's own). The icon circle,
+  the switch and the rulers take it through the lit-light family `data-accent` remaps; `compact` too.
 - **Whites** (`light_whites`, 1.10, #58): `temperature` (the default since 1.10, the owner's call) shows a lit white
   on one scale, from Home Assistant's own colour for its temperature (its `rgb_color`, marked a white: `WHITE`): its
   hue, and as much of the band's chroma as its share of a candle's (2,200 K) — a candle the warmest, 2,700 K plainly
@@ -3638,7 +3718,8 @@ panel) and the controls' row (the map's zone columns as buttons: a circle and it
 - **Heights** by the config alone (`vehicle-family.ts`): full 460 (its picture over the battery 176 more, a ring 68
   more, its tyres 112 more, a row 48, the card's own controls 76 a row more), compact 200, mini 76. A car out of reach
   keeps every part.
-- Its chunk is its own (`vehicle`, 20.2 KB of 24, its editor on its class): every page carries only its tag and height.
+- Its chunk is its own (`vehicle`): every page carries only its tag and height. Its editor went with the forms in 1.25
+  (`vehicle-editor.ts`, fetched the first time a card is edited), so a dashboard never loads it.
 
 ### A car that burns fuel (1.22, #207)
 
@@ -3686,6 +3767,46 @@ A petrol or diesel car is the same card with its tank where the battery is: noth
 - **Glyphs** (`vehicle/glyphs.ts`): the pump (its column on its foot, its display, its hose looped down, the nozzle hung
   at its top) and the oil can (its body, its cap, its spout raised, a drop under it: the dashboard's oil light); the
   service is the set's wrench, AdBlue its drop.
+
+### Its own controls, tyres, badge, small icons and picture (1.25, #248, #251, #254)
+
+Asked by @SentinelXS for a GWM car: nothing new in the anatomy but a line of small rounds at the foot and an engine
+glyph; every addition is off until a config asks for it.
+
+- **The engine** (`roles: engine`, a switch or a button): never found (the `NEVER` list keeps an engine's start and
+  stop out of discovery), named by hand. A control of its own after the lock, the set's new glyph (the dashboard's
+  engine light: its block, its cap on its stem, its intake, its manifold; 24 grid, 1.75 stroke). A switch says "Off"
+  or "Running" (lit in the card's colour) and asks before it starts and before it stops ("Start the engine?", "Stop the
+  engine?"); a button says its name and asks before it starts. Its `confirm: false` says never.
+- **An entity among the controls** (`controls: [{ entity }]`): the car's own cell — its round and its word under it —
+  drawn by the rounds' engine (`roundOf`): its name the word (cut to an ellipsis, as a name may be), its glyph, lit in
+  its tone or its colour while on, the dashed circle out of reach; a tap on and off where its kind takes one (as a
+  room's quick action: a switch, a script, a scene, a button), else its details; `confirm: true` asks before the tap
+  acts. Its name never widens the row: the cells are laid out by the car's own words, and it counts as a cell where
+  they give way and wrap. The editor's picker offers it as "Entity", its form the entity's own.
+- **The tyres**: all four in one count of decimals (`tyre_decimals`; else their sensors' display precision; else one
+  under 10, none above: 2.0 bar, 36 psi), the car from above giving way by the widest figure they run to in their unit
+  (whatever they read now), then each unit under its figure where two columns would not hold it beside (half a
+  section: the row's 36 holds the figure's 20 and the unit's 16). A tyre is low where the integration's warning says
+  so, or under `tyre_low` (a figure in the tyres' unit, an entity in its own unit of pressure, converted, or a template
+  read once answered): its figure and its wheel in the warning's ink, and the line says "Low tyre pressure" ("Tyres"
+  where it would not hold) between a service due and what stands open. The integration's own warning is said on the
+  line whether the tyres are drawn or not.
+- **The badge** (`badge`): words, an entity's state or a template in place of what the car is doing, in the head
+  (stepping into its line where it would not hold, as a person's own badge does) and on the strip's line; none while
+  its template is asked, the car's own where the answer is empty, "Unavailable" first.
+- **Small icons at the foot** (`quick_actions`): a room's quick actions (`roundsIn`), each an entity's 44 round, 8
+  apart from the line's start, as many as one line holds (those that do not give way from the end), their states in
+  pills under their glyphs (the line 64 tall) or beside them (`show_quick_states`, `quick_state_position`). 16 under
+  what they follow, in the whole card and the compact one; the line is declared by the config, kept while none of them
+  can be drawn.
+- **The picture at its own size** (`image_size`): a share of the card's width (`50%`, its plate 2:1 that wide,
+  centred) or a height (`120px`, the plate that tall across the column, the whole car inside it); the plate's height
+  is on the 4 grid at every width, the card's height following it. `show_head: false` and `show_hero: false` hide the
+  head and the battery: the first part then stands at the card's padding, and the line, with no battery over it, 16
+  under what it follows; with every part hidden the card is the picture alone, and the picture its button (the head's
+  tap, hold and double tap).
+- **Roles as a map** (`roles: { fuel: sensor.x }`) read as the list they mean, in the card and in its editor.
 
 ## Drive pad (1.20, #178)
 
@@ -3795,7 +3916,9 @@ may say its own (`details`).
   For a state it is the share of each stretch spent on (open, in use); for a thermostat what it measures. The line
   ends on what the entity reads now. The whole strip is one button to Fluvy's History page for the entity. Where the
   label and the words do not hold on one line the words go under the label, and a state's word gives way before a
-  figure is cut.
+  figure is cut. The house may leave it off a kind (1.25, #243: a speaker's day says little), an action may ask it or
+  not (`history`): the sheet then ends on what its body holds, its own padding under it, and asks the recorder
+  nothing. In the panel the kinds are a chip row under the sheets' row, every one chosen as before.
 - **Out of reach.** The sheet keeps its anatomy: the head in the off skin saying why, its rounds alive; the dial at
   "—" with no knob, the keys and the rows still, the chips dashed, all faded as one; the day in the neutral ink.
 - **Focus.** It opens on Close; Tab walks the sheet and nothing behind it; Escape, Close and a tap on the scrim close
@@ -4400,6 +4523,24 @@ last entry taken out in the editor — is a card, never a configuration error (#
   - **Dark:** black is the plate under the card (5.5 below it, or as deep as there is) with the dimmest glyph still legible — it never turns white; the other rungs lift above the card, white a near-white glyph on the palest plate a light word still reads on.
   - Between the ends the plates stand an equal CIEDE2000 step apart and the glyphs an equal step in lightness. A plate seen on the card (1.6) keeps a rest wash that is seen too (1.18), as `tint: always` asks. A solid palette's resting circle is still its wash of the plate (none in dark: the glyph alone tells the rungs apart there).
   - **Gates** (build tests, every preset, the community's palettes and a custom one of each character, base and fill, both modes): never above the softest colour's chroma (0.038); glyph 3:1 on the card, the page and its resting circle; on-fill 4.5 and its 80 % state line 4.5; hairline 1.35; on vs off 5.5; plates and glyphs strictly ordered; neighbours 5.5 apart, plate and glyph together; the lit light (the accent's twin) the rung itself.
+- **Exact colours (1.25, #250).** A card may wear the colours it names as they are named, not as the palette's tones
+  of them: its own `exact_colors: true`, or the house's *Exact colours* (§ Settings panel, Cards; off by default, and a
+  card's own `false` wins). A name is Home Assistant's own value (`HA_STANDARD_COLORS`, the table a bulb asked for a
+  name glows too: amber `#ffc107`, deep orange `#ff6f22`), a hex is as typed. It reaches every colour a person names —
+  the card's `color` and `card_color`, an item's, a state's, a threshold's, a chart's series, the house's set of series
+  colours (`--fc-exact` beside the two fitted ones, worn under `:host([exact-colors])`), a lit bulb's own — and none of
+  the palette's (its accent, its statuses, a device's state, an item named `primary`). The family is drawn in the colour
+  and kept legible (`build/exact.ts`): the ink (a glyph, a line, a bar, a ring, the first graph series) is the colour
+  itself, whatever its contrast — a pale yellow line on white is as faint as Home Assistant draws it; the fill is the
+  colour on a solid palette and a fifth of it over the card on a tint one, as Home Assistant's tile draws its icon's
+  plate, its hairline fitted 1.35 off it; the words on the fill and on the colour are the palette's black or white,
+  whichever reads, taken to 4.5; the text form (a figure, a link, a reading in its band) is the colour taken lighter or
+  deeper, lightness only, only as far as 4.5 on the card and the page; the hover, the primary action, the ramp and the
+  other series follow from the colour's own hue and chroma, never the palette's band; the rest wash, the lit surfaces
+  and a card's own surface are derived from that fill as any colour's are. The table and the arithmetic are a chunk of
+  their own, fetched by the first card that asks (its first frame waits for it, as a see-through card's does for its
+  sheet), never by a house of palette tones; the derivations a card keeps are kept apart from the palette's
+  (`|exact` in their keys).
 - **A card's own surface (1.7, the second exception).** `card_color` tints the card itself: `--fluvy-card` becomes a
   wash of the colour's fill over the palette's card (`surfaceWash`: as much of the fill, up to 40 %, as keeps the
   primary and the secondary ink at 4.5 and the fill's hairline at 1.35 over it; with none to spare, the card itself),
@@ -4437,8 +4578,9 @@ last entry taken out in the editor — is a card, never a configuration error (#
   from the card. In a tint palette the whole way from the card to the fill is about 1.25, so the rest wash and the
   fill are close in lightness: on and off are told apart by the icon circle (filled when on), the fill's step and the
   state's word. The words keep
-  their usual ink. A named colour is Home Assistant's tone on the palette (amber is the lit light's ink, which a
-  palette may move aside): the palette keeps its harmony, and a hex picks one exactly.
+  their usual ink. A named colour is Home Assistant's tone on the palette (amber is the lit light's own hue, 1.25,
+  #250: a light that is on is the palette's accent, amber never is): the palette keeps its harmony, and a hex picks its
+  hue (exactly, with exact colours, above).
   **A lit light in its bulb's colour (1.9, #41)**: tiles, a tiles group, a room's tiles, a room's lights row (the
   colour of what is lit, by brightness) and an entities card's light rows wear a lit colour bulb's colour
   (`light_colors`; the house's where the card says none, off), a white its warmth (`light_whites`, 1.10), an off light
@@ -4532,6 +4674,7 @@ last entry taken out in the editor — is a card, never a configuration error (#
 - **Text is never cut** but for names: the day's title steps down (32 → 24 on a desktop; the phone's short form 24 → 20; still too wide, its two ends — or its words — go on two balanced lines), state pills never shrink and are sized in layout (the canvas knows no font features; `@fluvy/ui`'s `textWidth` measures with them), "from › to" wraps as a unit and breaks after its arrow only when wider than its whole line, a burst's or a repeat's entry puts its change under its time on a short line, a line of parts ("135 changes · 3 runs · 1 restart", a detail's date · time) drops the "·" of a part that starts a line. The desktop layout starts at 720 (where its day header fits).
 - **Filters** are the language's chips (a 36 pill in a 44 target): on a desktop, one row or two balanced rows of equal cells (5 · 5) — never more; when two rows cannot hold the labels, and on a phone, a strip of fitted pills (wheel and mouse drag too, faded at its ends). A filter that would change nothing is not offered: no row for one entity, on an empty day, or when every chip would show the same count; while searching, the counts are the search's.
 - **Dates**: presets on top (Today · Yesterday over Last 7 days; a week is two taps on the grid, so the presets stay one short row), the language's calendar choosing a period, on seven equal cells (44 in the popover, wider in a phone's sheet, 41 wide × 44 tall on a 320 phone), the chosen days one band (its ends filled), the hours of the first and last day in **our time field** (hh : mm in the house's clock, and the day's half on a 12-hour one; digits, ↑ ↓, a whole segment moves on; a whole last day reads 24:00, or 11:59 PM on a 12-hour clock, where 12:00 AM would read as the day's start), one accent Show — kept back, with the reason under it, while the end is not after the start. Field labels are the fields' 13/500. A popover (radius 16) on a desktop; a bottom sheet with a grabber, its title and close on a phone, Show 24 over the phone's home bar on both pages (`fv-drawer--dates`, 1.21, #190: the History's stood on its 16, the bar's inset left out). The picker says only the pages' shared words (`page`), so every page that opens it holds every word it says (the History page showed the raw "from" and "to" in 1.8.0, when the two were the Activity page's own). **Sources**: a drawer out of the floating frame in its shape, hosting Home Assistant's own picker.
+- **Who did it** (1.25, the house's `activityWho`, off until chosen): the person behind an entry is a **face** — their picture, over their initials that show wherever it will not load; a person's initials on the accent fill, an account's (a tool's, an integration's) on the card's fill with its hairline, as the quiet circles. In a row it is 16 and fills the second line's 16, so **a row never grows**: after a run's (or an action's) name when a person's tap fired it ("Good night ⊙", spoken "By Ana", Home Assistant's own words), else in place of the person glyph, before the name. In the detail, **Who** follows Cause: a 20 face, the name · what they are, › to the person's details (an account is only named); a cause that is that person already takes the face instead. The one reading is "You". Nobody is invented: no account, no face. **By person** is a 44 round beside Sources (the chosen one's 28 face in it, on the accent fill), opening the language's dropdown: Everyone, the one reading, then the busiest; it narrows as the search does.
 - **On a card** (a person's preference): the column in its own card (radius 20, hairline), its controls on the page's fill; the room at the foot stays outside the card.
 - **A period across midnight** names each day above its first hour, and dates its start ("Start of the period · Sep 16"); a more-info's "Show more" reads **Last 24 hours**, the entity's name as the eyebrow.
 - **Motion**: another day — its title turns in from where the day went while the list leaves that way (160 ms; the summary says "Loading…" meanwhile), a skeleton holds the place, the new rows rise (30 ms apart, 10 at most). A live entry opens its place from nothing (grid rows 0fr → 1fr, 320 ms; its clip has no padding, so the row and its spine are where every row's are) with a ring that grows and fades (transform, 1.4 s); counters roll up. "N new" sits in the pinned header's 40 band, whose count steps aside meanwhile. Fluvy's Reduce motion reaches the rail's and the dates' shadow roots too. While the view's file loads, the takeover keeps our bar (Home Assistant's menu on a phone, the page's name) — never a blank page. Layers leave with **keyframes of their own** (an animation that keeps its name is not restarted: a reversed direction alone never ends, and a click-catching scrim would stay) and a timer that removes them regardless.

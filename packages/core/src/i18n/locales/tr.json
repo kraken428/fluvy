@@ -685,7 +685,10 @@
     "state_display": "Durum gösterimi",
     "state_icons": "Duruma göre simgeler",
     "state_icons_helper": "Her satırda bir durum ve simgesi (ok: mdi:check-circle-outline); listede olmayan durum sözcükleriyle kalır",
-    "state_icon_colors_helper": "Her satırda bir durum ve tonu ya da rengi (warning: warning)"
+    "state_icon_colors_helper": "Her satırda bir durum ve tonu ya da rengi (warning: warning)",
+    "horizontal": "Yatay",
+    "exact_colors": "Tam renkler",
+    "exact_colors_helper": "Adlar Home Assistant’ın çizdiği gibi, hex kodu yazıldığı gibi. Dokunulmazsa, Fluvy ayarlarındaki tüm kartlarınki"
   },
   "strategy": {
     "home": "Ana sayfa",
@@ -850,7 +853,15 @@
     "trigger.time_pattern": "zaman deseni",
     "trigger.time": "zaman",
     "trigger.homeassistant_stopping": "Home Assistant durduruluyor",
-    "trigger.homeassistant_starting": "Home Assistant başlatılıyor"
+    "trigger.homeassistant_starting": "Home Assistant başlatılıyor",
+    "fact.who": "Kim",
+    "kind.account": "Hesap",
+    "kind.integration": "Entegrasyon",
+    "you": "Siz",
+    "by": "{name} tarafından",
+    "by_you": "Sizin tarafınızdan",
+    "by_person": "Kişiye göre",
+    "everyone": "Herkes"
   },
   "keypad": {
     "close": "Kapat",
@@ -1675,7 +1686,12 @@
     "dashboard.up_to": "En fazla…",
     "dashboard.up_to_count": "Liste başına en fazla {count}",
     "cards.levels": "Simgeler seviyeyi gösterir",
-    "cards.levels_sub": "Pilin şarjı, sinyalin çubukları, vananın açık ya da kapalı olması"
+    "cards.levels_sub": "Pilin şarjı, sinyalin çubukları, vananın açık ya da kapalı olması",
+    "cards.sheets_history": "Ayrıntılarda son 24 saat",
+    "cards.exact": "Tam renkler",
+    "cards.exact_sub": "Renk adları Home Assistant’ın çizdiği gibi, hex kodu yazıldığı gibi; paletin tonları değil",
+    "scope.activity_who": "Kimin yaptığı",
+    "scope.activity_who_sub": "Etkinlik’teki her kayıt, arkasındaki kişiyi fotoğrafıyla gösterir; kişiye göre filtre"
   },
   "customise": {
     "title": "Özelleştirme",
@@ -3435,7 +3451,19 @@
     "editor.electric": "Elektrik",
     "editor.hybrid": "Şarj edilebilir hibrit",
     "editor.tank_size": "Depo hacmi",
-    "editor.tank_size_helper": "İçindekinin biriminde (L, gal): aracın yalnızca içindekini bildirdiği yerde doluluğu"
+    "editor.tank_size_helper": "İçindekinin biriminde (L, gal): aracın yalnızca içindekini bildirdiği yerde doluluğu",
+    "tyre_pressure_low": "Lastik basıncı düşük",
+    "editor.tyre_decimals": "Lastik basıncı ondalıkları",
+    "editor.tyre_low": "Düşük lastik basıncı sınırı",
+    "editor.tyre_low_helper": "Lastiklerin biriminde bir basınç, bir varlık veya {{ states('sensor.x') }} gibi bir şablon",
+    "engine": "Motor",
+    "engine_running": "Çalışıyor",
+    "start_engine_confirm": "Motor çalıştırılsın mı?",
+    "stop_engine_confirm": "Motor durdurulsun mu?",
+    "editor.show_head": "Başlığı göster",
+    "editor.show_hero": "Bataryayı göster",
+    "editor.image_size": "Resim boyutu",
+    "editor.image_size_helper": "Kart genişliğinin bir payı (50% gibi) veya bir yükseklik (120px gibi)"
   },
   "remote": {
     "key.power": "Güç",
@@ -3603,8 +3631,8 @@
     "style": "Yüzey",
     "panel": "Şerit",
     "card": "Kart",
-    "width_tablet": "Tablette genişlik (px)",
-    "width_desktop": "Masaüstünde genişlik (px)",
+    "width_tablet": "Tablette genişlik",
+    "width_desktop": "Masaüstünde genişlik",
     "phone": "Telefonda",
     "top": "Görünümün üstünde",
     "drawer": "Çekmece",
@@ -3621,7 +3649,9 @@
     "yaml": "Bu panel YAML ile yazılmış. Bunu dosyasına, views: satırının yanına kopyalayın",
     "copy": "YAML’i kopyala",
     "copied": "YAML kopyalandı",
-    "copy_failed": "Kopyalanamadı: metni seçip kopyalayın"
+    "copy_failed": "Kopyalanamadı: metni seçip kopyalayın",
+    "unit_screen": "Ekranın yüzdesi",
+    "unit_dashboard": "Panelin yüzdesi"
   },
   "compass": {
     "direction": "Yön",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Ok",
     "arrow_points": "Ok yönü",
     "arrow_outward": "Dışa doğru",
-    "arrow_inward": "İçe doğru"
+    "arrow_inward": "İçe doğru",
+    "pointer_chevron": "Köşeli ok",
+    "face": "Kadran"
   },
   "schedule": {
     "card": "Isıtma planı",

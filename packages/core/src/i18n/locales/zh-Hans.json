@@ -66,7 +66,15 @@
     "trigger.time_pattern": "时间模式",
     "trigger.time": "时间",
     "trigger.homeassistant_stopping": "Home Assistant 停止中",
-    "trigger.homeassistant_starting": "Home Assistant 启动中"
+    "trigger.homeassistant_starting": "Home Assistant 启动中",
+    "fact.who": "操作人",
+    "kind.account": "账户",
+    "kind.integration": "集成",
+    "you": "您",
+    "by": "由{name}操作",
+    "by_you": "由您操作",
+    "by_person": "按人员",
+    "everyone": "所有人"
   },
   "alerts": {
     "preset.low_battery": "电池电量低",
@@ -2032,7 +2040,10 @@
     "state_display": "状态显示为",
     "state_icons": "按状态设置图标",
     "state_icons_helper": "每行一个状态及其图标（ok: mdi:check-circle-outline）；未列出的状态仍显示文字",
-    "state_icon_colors_helper": "每行一个状态及其色调或颜色（warning: warning）"
+    "state_icon_colors_helper": "每行一个状态及其色调或颜色（warning: warning）",
+    "horizontal": "横向",
+    "exact_colors": "精确颜色",
+    "exact_colors_helper": "名称按 Home Assistant 的颜色，十六进制色值按输入。未设置：沿用 Fluvy 设置中所有卡片的值"
   },
   "energy-period-card": {
     "name": "能源周期",
@@ -2718,7 +2729,7 @@
     "pref.language": "语言",
     "pref.auto": "自动",
     "pref.reduce": "减弱动态效果",
-    "pref.reduce_sub": "跟随设备设置",
+    "pref.reduce_sub": "无论设备如何设置",
     "pref.hold": "按住再滑动",
     "pref.hold_sub": "在触摸屏上，滑块需按住片刻才会移动",
     "pref.haptics": "触感反馈",
@@ -3044,7 +3055,12 @@
     "dashboard.up_to": "最多…",
     "dashboard.up_to_count": "每个列表最多 {count} 项",
     "cards.levels": "图标显示级别",
-    "cards.levels_sub": "电池电量、信号格数、阀门开关"
+    "cards.levels_sub": "电池电量、信号格数、阀门开关",
+    "cards.sheets_history": "详情面板显示过去 24 小时",
+    "cards.exact": "精确颜色",
+    "cards.exact_sub": "颜色名称按 Home Assistant 的颜色显示，十六进制色值按输入显示，而非配色的色调",
+    "scope.activity_who": "谁操作的",
+    "scope.activity_who_sub": "活动中的每条记录都显示操作人及其照片；可按人员筛选"
   },
   "customise": {
     "title": "自定义",
@@ -3357,7 +3373,19 @@
     "editor.electric": "纯电",
     "editor.hybrid": "插电混动",
     "editor.tank_size": "油箱容量",
-    "editor.tank_size_helper": "单位与油箱内容相同（L、gal）：车辆只报告油量时，用于算出油位"
+    "editor.tank_size_helper": "单位与油箱内容相同（L、gal）：车辆只报告油量时，用于算出油位",
+    "tyre_pressure_low": "胎压偏低",
+    "editor.tyre_decimals": "胎压小数位",
+    "editor.tyre_low": "胎压低于此值算偏低",
+    "editor.tyre_low_helper": "与轮胎同单位的气压值、实体，或模板，如 {{ states('sensor.x') }}",
+    "engine": "发动机",
+    "engine_running": "运转中",
+    "start_engine_confirm": "启动发动机？",
+    "stop_engine_confirm": "关闭发动机？",
+    "editor.show_head": "显示标题栏",
+    "editor.show_hero": "显示电池",
+    "editor.image_size": "图片大小",
+    "editor.image_size_helper": "卡片宽度的比例，如 50%，或高度，如 120px"
   },
   "expander": {
     "card": "折叠面板",
@@ -3603,8 +3631,8 @@
     "style": "表面",
     "panel": "面板",
     "card": "卡片",
-    "width_tablet": "平板上的宽度（px）",
-    "width_desktop": "电脑上的宽度（px）",
+    "width_tablet": "平板上的宽度",
+    "width_desktop": "电脑上的宽度",
     "phone": "在手机上",
     "top": "视图上方",
     "drawer": "抽屉",
@@ -3621,7 +3649,9 @@
     "yaml": "此仪表盘使用 YAML 编写。请把以下内容复制到它的文件里，与 views: 并列",
     "copy": "复制 YAML",
     "copied": "YAML 已复制",
-    "copy_failed": "无法复制：选中文本后手动复制"
+    "copy_failed": "无法复制：选中文本后手动复制",
+    "unit_screen": "屏幕占比（%）",
+    "unit_dashboard": "仪表盘占比（%）"
   },
   "compass": {
     "direction": "方向",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "箭头",
     "arrow_points": "箭头方向",
     "arrow_outward": "朝外",
-    "arrow_inward": "朝内"
+    "arrow_inward": "朝内",
+    "pointer_chevron": "人字形",
+    "face": "刻度盘"
   },
   "schedule": {
     "card": "供暖计划",

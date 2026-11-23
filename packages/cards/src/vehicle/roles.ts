@@ -13,7 +13,8 @@ import { deviceSlug, withoutSlug } from '../appliance/roles.js';
  * plays a role over a helper a person attached to its device. A role the card names by hand (`roles`) wins, and with
  * `scan: false` only those play. What could move the car or wake it, sound it or open a garage — a horn, the lights,
  * keyless driving, a remote engine start, a forced refresh that drains the small battery, valet mode, the route's
- * tracker — is never a role, nor is a charge port's latch taken for the car's lock, or a 12 V battery for the car's.
+ * tracker — is never found for a role (a person may name what starts the engine: `engine`), nor is a charge port's
+ * latch taken for the car's lock, or a 12 V battery for the car's.
  *
  * A car that burns fuel says its tank in the same integrations' words — its level, its range, what is in it, its
  * warning — and its AdBlue, its oil and its next service where it has them; and in those of the HACS integrations most
@@ -59,6 +60,11 @@ export type VehicleRole =
   | 'frunk'
   /** A cover that vents and closes every window at once. */
   | 'windows'
+  /**
+   * What starts its engine (#248): a switch that starts and stops it, or a button that starts it. Named by hand only:
+   * nothing that starts an engine is ever found.
+   */
+  | 'engine'
   | 'sentry'
   | 'odometer'
   | 'location'
@@ -117,6 +123,7 @@ export const VEHICLE_ROLES: readonly VehicleRole[] = [
   'trunk',
   'frunk',
   'windows',
+  'engine',
   'sentry',
   'odometer',
   'location',
@@ -203,6 +210,7 @@ const DOMAINS: Readonly<Record<VehicleRole, readonly string[]>> = {
   trunk: ['cover', 'binary_sensor', 'sensor'],
   frunk: ['cover', 'binary_sensor', 'sensor'],
   windows: ['cover'],
+  engine: ['switch', 'button'],
   sentry: ['switch'],
   odometer: ['sensor'],
   location: ['device_tracker'],
@@ -1056,6 +1064,15 @@ export interface NamedRole {
   readonly role: string;
   readonly entity: string;
 }
+
+/**
+ * Roles written as a map, each role to its entity (`roles: { fuel: sensor.x }`, as YAML writes them as readily): the
+ * list they mean, an entry that names no entity left out.
+ */
+export const rolesOfMap = (map: Readonly<Record<string, unknown>>): NamedRole[] =>
+  Object.entries(map).flatMap(([role, entity]) =>
+    typeof entity === 'string' && entity ? [{ role, entity }] : [],
+  );
 
 /**
  * Every role the car's device fills — by the entity known most surely to play it, its integration's own over a helper

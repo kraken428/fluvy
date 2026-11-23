@@ -999,7 +999,15 @@
     "trigger.time_pattern": "шаблон часу",
     "trigger.time": "час",
     "trigger.homeassistant_stopping": "Зупинка Home Assistant",
-    "trigger.homeassistant_starting": "Запуск Home Assistant"
+    "trigger.homeassistant_starting": "Запуск Home Assistant",
+    "fact.who": "Хто",
+    "kind.account": "Обліковий запис",
+    "kind.integration": "Інтеграція",
+    "you": "Ви",
+    "by": "Хто: {name}",
+    "by_you": "Хто: ви",
+    "by_person": "За особою",
+    "everyone": "Усі"
   },
   "alerts": {
     "preset.low_battery": "Низький заряд",
@@ -2127,7 +2135,10 @@
     "state_display": "Вигляд стану",
     "state_icons": "Значки за станами",
     "state_icons_helper": "У кожному рядку стан і його значок (ok: mdi:check-circle-outline); стан не зі списку лишається словами",
-    "state_icon_colors_helper": "У кожному рядку стан і його тон або колір (warning: warning)"
+    "state_icon_colors_helper": "У кожному рядку стан і його тон або колір (warning: warning)",
+    "horizontal": "Горизонтальний",
+    "exact_colors": "Точні кольори",
+    "exact_colors_helper": "Назви так, як їх малює Home Assistant, hex-код як введено. Не задано: як у всіх карток у налаштуваннях Fluvy"
   },
   "energy-period-card": {
     "name": "Період енергії",
@@ -3168,7 +3179,12 @@
     "dashboard.up_to": "До…",
     "dashboard.up_to_count": "До {count} у списку",
     "cards.levels": "Значки показують рівень",
-    "cards.levels_sub": "Заряд батареї, поділки сигналу, клапан відкритий чи закритий"
+    "cards.levels_sub": "Заряд батареї, поділки сигналу, клапан відкритий чи закритий",
+    "cards.sheets_history": "Останні 24 години в подробицях",
+    "cards.exact": "Точні кольори",
+    "cards.exact_sub": "Назви кольорів так, як їх малює Home Assistant, і hex-код як введено, а не відтінки палітри",
+    "scope.activity_who": "Хто це зробив",
+    "scope.activity_who_sub": "Кожен запис «Активності» називає людину, яка за ним стоїть, з її фото; фільтр за особою"
   },
   "customise": {
     "title": "Налаштувати",
@@ -3565,7 +3581,19 @@
     "editor.electric": "Електрика",
     "editor.hybrid": "Гібрид із підзарядкою",
     "editor.tank_size": "Об’єм бака",
-    "editor.tank_size_helper": "В одиницях вмісту (L, gal): рівень, коли автомобіль повідомляє лише вміст"
+    "editor.tank_size_helper": "В одиницях вмісту (L, gal): рівень, коли автомобіль повідомляє лише вміст",
+    "tyre_pressure_low": "Низький тиск у шинах",
+    "editor.tyre_decimals": "Знаків після коми: шини",
+    "editor.tyre_low": "Поріг низького тиску в шинах",
+    "editor.tyre_low_helper": "Тиск в одиницях шин, сутність або шаблон, наприклад {{ states('sensor.x') }}",
+    "engine": "Двигун",
+    "engine_running": "Працює",
+    "start_engine_confirm": "Запустити двигун?",
+    "stop_engine_confirm": "Заглушити двигун?",
+    "editor.show_head": "Показувати заголовок",
+    "editor.show_hero": "Показувати батарею",
+    "editor.image_size": "Розмір зображення",
+    "editor.image_size_helper": "Частка ширини картки, наприклад 50%, або висота, наприклад 120px"
   },
   "expander": {
     "card": "Розгортний блок",
@@ -3729,8 +3757,8 @@
     "style": "Поверхня",
     "panel": "Смуга",
     "card": "Картка",
-    "width_tablet": "Ширина на планшеті (px)",
-    "width_desktop": "Ширина на комп’ютері (px)",
+    "width_tablet": "Ширина на планшеті",
+    "width_desktop": "Ширина на комп’ютері",
     "phone": "На телефоні",
     "top": "Над вкладкою",
     "drawer": "Висувна",
@@ -3747,7 +3775,9 @@
     "yaml": "Цю панель написано на YAML. Скопіюйте це в її файл, поруч із views:",
     "copy": "Копіювати YAML",
     "copied": "YAML скопійовано",
-    "copy_failed": "Не вдалося скопіювати: виділіть текст і скопіюйте його вручну"
+    "copy_failed": "Не вдалося скопіювати: виділіть текст і скопіюйте його вручну",
+    "unit_screen": "% екрана",
+    "unit_dashboard": "% панелі"
   },
   "compass": {
     "direction": "Напрямок",
@@ -3765,7 +3795,9 @@
     "pointer_arrow": "Стрілка",
     "arrow_points": "Стрілка вказує",
     "arrow_outward": "Назовні",
-    "arrow_inward": "Усередину"
+    "arrow_inward": "Усередину",
+    "pointer_chevron": "Шеврон",
+    "face": "Шкала"
   },
   "schedule": {
     "card": "Графік опалення",

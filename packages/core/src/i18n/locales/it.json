@@ -685,7 +685,10 @@
     "state_display": "Stato mostrato come",
     "state_icons": "Icone per stato",
     "state_icons_helper": "Uno stato e la sua icona per riga (ok: mdi:check-circle-outline); uno stato non elencato resta in parole",
-    "state_icon_colors_helper": "Uno stato e il suo tono o colore per riga (warning: warning)"
+    "state_icon_colors_helper": "Uno stato e il suo tono o colore per riga (warning: warning)",
+    "horizontal": "Orizzontale",
+    "exact_colors": "Colori esatti",
+    "exact_colors_helper": "I nomi come li disegna Home Assistant, un codice esadecimale come scritto. Invariato, quello di tutte le schede nelle impostazioni di Fluvy"
   },
   "strategy": {
     "home": "Casa",
@@ -850,7 +853,15 @@
     "trigger.time_pattern": "schema orario",
     "trigger.time": "ora",
     "trigger.homeassistant_stopping": "Home Assistant in arresto",
-    "trigger.homeassistant_starting": "Home Assistant in avvio"
+    "trigger.homeassistant_starting": "Home Assistant in avvio",
+    "fact.who": "Chi",
+    "kind.account": "Account",
+    "kind.integration": "Integrazione",
+    "you": "Tu",
+    "by": "Da {name}",
+    "by_you": "Da te",
+    "by_person": "Per persona",
+    "everyone": "Tutti"
   },
   "keypad": {
     "close": "Chiudi",
@@ -1675,7 +1686,12 @@
     "dashboard.up_to": "Fino a…",
     "dashboard.up_to_count": "Fino a {count} per elenco",
     "cards.levels": "Le icone mostrano il livello",
-    "cards.levels_sub": "La carica di una batteria, le tacche di un segnale, una valvola aperta o chiusa"
+    "cards.levels_sub": "La carica di una batteria, le tacche di un segnale, una valvola aperta o chiusa",
+    "cards.sheets_history": "Ultime 24 ore nei dettagli",
+    "cards.exact": "Colori esatti",
+    "cards.exact_sub": "I nomi dei colori come li disegna Home Assistant e un codice esadecimale come scritto, non le tinte della palette",
+    "scope.activity_who": "Chi è stato",
+    "scope.activity_who_sub": "Ogni voce di Attività indica la persona che l’ha fatta, con la sua foto; un filtro per persona"
   },
   "customise": {
     "title": "Personalizzazione",
@@ -3435,7 +3451,19 @@
     "editor.electric": "Elettrica",
     "editor.hybrid": "Ibrida plug-in",
     "editor.tank_size": "Capacità del serbatoio",
-    "editor.tank_size_helper": "Nell’unità del contenuto (L, gal): il suo livello, dove l’auto dice solo cosa contiene"
+    "editor.tank_size_helper": "Nell’unità del contenuto (L, gal): il suo livello, dove l’auto dice solo cosa contiene",
+    "tyre_pressure_low": "Pressione pneumatici bassa",
+    "editor.tyre_decimals": "Decimali dei pneumatici",
+    "editor.tyre_low": "Pneumatico sgonfio sotto",
+    "editor.tyre_low_helper": "Una pressione nell’unità dei pneumatici, un’entità o un template come {{ states('sensor.x') }}",
+    "engine": "Motore",
+    "engine_running": "Acceso",
+    "start_engine_confirm": "Avviare il motore?",
+    "stop_engine_confirm": "Spegnere il motore?",
+    "editor.show_head": "Mostra l’intestazione",
+    "editor.show_hero": "Mostra la batteria",
+    "editor.image_size": "Dimensione dell’immagine",
+    "editor.image_size_helper": "Una parte della larghezza della scheda, come 50%, o un’altezza, come 120px"
   },
   "remote": {
     "key.power": "Accensione",
@@ -3603,8 +3631,8 @@
     "style": "Superficie",
     "panel": "Pannello",
     "card": "Scheda",
-    "width_tablet": "Larghezza su un tablet (px)",
-    "width_desktop": "Larghezza su un computer (px)",
+    "width_tablet": "Larghezza su un tablet",
+    "width_desktop": "Larghezza su un computer",
     "phone": "Su un telefono",
     "top": "Sopra la vista",
     "drawer": "Cassetto",
@@ -3621,7 +3649,9 @@
     "yaml": "Questa dashboard è scritta in YAML. Copia questo nel suo file, accanto a views:",
     "copy": "Copia lo YAML",
     "copied": "YAML copiato",
-    "copy_failed": "Copia non riuscita: seleziona il testo e copialo"
+    "copy_failed": "Copia non riuscita: seleziona il testo e copialo",
+    "unit_screen": "% dello schermo",
+    "unit_dashboard": "% della dashboard"
   },
   "compass": {
     "direction": "Direzione",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Freccia",
     "arrow_points": "La freccia punta",
     "arrow_outward": "Verso l’esterno",
-    "arrow_inward": "Verso l’interno"
+    "arrow_inward": "Verso l’interno",
+    "pointer_chevron": "Gallone",
+    "face": "Quadrante"
   },
   "schedule": {
     "card": "Programma riscaldamento",

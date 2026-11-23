@@ -1,6 +1,6 @@
 {
   "name": "@fluvy/tokens",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "private": true,
   "description": "Design tokens for the Fluvy theme: OKLCH derivation, palettes, CSS/JSON emitters",
   "license": "GPL-3.0-only",
@@ -27,7 +27,9 @@
     "./config": "./src/config.ts",
     "./runtime": "./src/runtime.ts",
     "./community": "./src/palettes/community/index.ts",
-    "./series": "./src/build/series.ts"
+    "./series": "./src/build/series.ts",
+    "./standard": "./src/ha/standard.ts",
+    "./exact": "./src/build/exact.ts"
   },
   "scripts": {
     "build": "tsc --noEmit -p tsconfig.json && tsx scripts/community.ts && tsx src/build/run.ts",

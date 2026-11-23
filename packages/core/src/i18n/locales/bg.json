@@ -1003,7 +1003,15 @@
     "trigger.time_pattern": "времеви модел",
     "trigger.time": "време",
     "trigger.homeassistant_stopping": "спиране на Home Assistant",
-    "trigger.homeassistant_starting": "стартиране на Home Assistant"
+    "trigger.homeassistant_starting": "стартиране на Home Assistant",
+    "fact.who": "Кой",
+    "kind.account": "Акаунт",
+    "kind.integration": "Интеграция",
+    "you": "Вие",
+    "by": "От {name}",
+    "by_you": "От вас",
+    "by_person": "По лице",
+    "everyone": "Всички"
   },
   "alerts": {
     "preset.low_battery": "Слаби батерии",
@@ -2136,7 +2144,10 @@
     "state_display": "Състоянието като",
     "state_icons": "Икони по състояние",
     "state_icons_helper": "Състояние и неговата икона на всеки ред (ok: mdi:check-circle-outline); непосочено състояние остава с думи",
-    "state_icon_colors_helper": "Състояние и неговият тон или цвят на всеки ред (warning: warning)"
+    "state_icon_colors_helper": "Състояние и неговият тон или цвят на всеки ред (warning: warning)",
+    "horizontal": "Хоризонтален",
+    "exact_colors": "Точни цветове",
+    "exact_colors_helper": "Имената, както ги рисува Home Assistant, hex код, както е въведен. Непроменено: като на всички карти, от настройките на Fluvy"
   },
   "energy-period-card": {
     "name": "Енергиен период",
@@ -3202,7 +3213,12 @@
     "dashboard.up_to": "До…",
     "dashboard.up_to_count": "До {count} на списък",
     "cards.levels": "Иконите показват нивото",
-    "cards.levels_sub": "Зарядът на батерия, чертите на сигнал, клапан отворен или затворен"
+    "cards.levels_sub": "Зарядът на батерия, чертите на сигнал, клапан отворен или затворен",
+    "cards.sheets_history": "Последните 24 часа в подробностите",
+    "cards.exact": "Точни цветове",
+    "cards.exact_sub": "Имената на цветовете, както ги рисува Home Assistant, и hex код, както е въведен, не оттенъците на палитрата",
+    "scope.activity_who": "Кой го е направил",
+    "scope.activity_who_sub": "Всеки запис в „Дейност“ назовава човека зад него, със снимката му; филтър по лице"
   },
   "remote": {
     "key.power": "Захранване",
@@ -3342,8 +3358,8 @@
     "style": "Повърхност",
     "panel": "Панел",
     "card": "Карта",
-    "width_tablet": "Ширина на таблет (px)",
-    "width_desktop": "Ширина на компютър (px)",
+    "width_tablet": "Ширина на таблет",
+    "width_desktop": "Ширина на компютър",
     "phone": "На телефон",
     "top": "Над изгледа",
     "drawer": "Плъзгаща се",
@@ -3360,7 +3376,9 @@
     "yaml": "Това табло е написано на YAML. Копирайте това във файла му, до views:",
     "copy": "Копиране на YAML",
     "copied": "YAML е копиран",
-    "copy_failed": "Копирането не успя: маркирайте текста и го копирайте"
+    "copy_failed": "Копирането не успя: маркирайте текста и го копирайте",
+    "unit_screen": "% от екрана",
+    "unit_dashboard": "% от таблото"
   },
   "sidebar": {
     "label": "Странична лента",
@@ -3597,7 +3615,19 @@
     "editor.electric": "Електричество",
     "editor.hybrid": "Плъг-ин хибрид",
     "editor.tank_size": "Обем на резервоара",
-    "editor.tank_size_helper": "В единицата на съдържанието (L, gal): за нивото, когато автомобилът казва само колко има в резервоара"
+    "editor.tank_size_helper": "В единицата на съдържанието (L, gal): за нивото, когато автомобилът казва само колко има в резервоара",
+    "tyre_pressure_low": "Ниско налягане в гумите",
+    "editor.tyre_decimals": "Десетични знаци: гуми",
+    "editor.tyre_low": "Ниско налягане под",
+    "editor.tyre_low_helper": "Налягане в единицата на гумите, обект или шаблон, например {{ states('sensor.x') }}",
+    "engine": "Двигател",
+    "engine_running": "Работи",
+    "start_engine_confirm": "Стартиране на двигателя?",
+    "stop_engine_confirm": "Спиране на двигателя?",
+    "editor.show_head": "Показване на заглавието",
+    "editor.show_hero": "Показване на батерията",
+    "editor.image_size": "Размер на изображението",
+    "editor.image_size_helper": "Дял от ширината на картата, например 50%, или височина, например 120px"
   },
   "web": {
     "card": "Уеб страница",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Стрелка",
     "arrow_points": "Стрелката сочи",
     "arrow_outward": "Навън",
-    "arrow_inward": "Навътре"
+    "arrow_inward": "Навътре",
+    "pointer_chevron": "Шеврон",
+    "face": "Скала"
   },
   "schedule": {
     "card": "График за отопление",

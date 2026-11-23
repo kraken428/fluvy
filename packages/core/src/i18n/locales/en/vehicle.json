@@ -138,6 +138,18 @@
     "editor.electric": "Electric",
     "editor.hybrid": "Plug-in hybrid",
     "editor.tank_size": "Tank size",
-    "editor.tank_size_helper": "In the unit of what is in it (L, gal): its level, where the car says only what is in it"
+    "editor.tank_size_helper": "In the unit of what is in it (L, gal): its level, where the car says only what is in it",
+    "tyre_pressure_low": "Low tyre pressure",
+    "editor.tyre_decimals": "Tyre decimals",
+    "editor.tyre_low": "Low tyre under",
+    "editor.tyre_low_helper": "A pressure in the tyres’ unit, an entity, or a template such as {{ states('sensor.x') }}",
+    "engine": "Engine",
+    "engine_running": "Running",
+    "start_engine_confirm": "Start the engine?",
+    "stop_engine_confirm": "Stop the engine?",
+    "editor.show_head": "Show the head",
+    "editor.show_hero": "Show the battery",
+    "editor.image_size": "Picture size",
+    "editor.image_size_helper": "A share of the card’s width, such as 50%, or a height, such as 120px"
   }
 }

@@ -72,7 +72,15 @@
     "trigger.time_pattern": "časový vzor",
     "trigger.time": "čas",
     "trigger.homeassistant_stopping": "Home Assistant se ukončuje",
-    "trigger.homeassistant_starting": "Home Assistant se spouští"
+    "trigger.homeassistant_starting": "Home Assistant se spouští",
+    "fact.who": "Kdo",
+    "kind.account": "Účet",
+    "kind.integration": "Integrace",
+    "you": "Vy",
+    "by": "Kdo: {name}",
+    "by_you": "Kdo: vy",
+    "by_person": "Podle osoby",
+    "everyone": "Všichni"
   },
   "alerts": {
     "preset.low_battery": "Slabé baterie",
@@ -1434,7 +1442,10 @@
     "state_display": "Stav zobrazit jako",
     "state_icons": "Ikony podle stavu",
     "state_icons_helper": "Na každém řádku stav a jeho ikona (ok: mdi:check-circle-outline); neuvedený stav zůstane slovy",
-    "state_icon_colors_helper": "Na každém řádku stav a jeho tón nebo barva (warning: warning)"
+    "state_icon_colors_helper": "Na každém řádku stav a jeho tón nebo barva (warning: warning)",
+    "horizontal": "Vodorovná",
+    "exact_colors": "Přesné barvy",
+    "exact_colors_helper": "Názvy tak, jak je kreslí Home Assistant, hex kód tak, jak je zadán. Beze změny: podle nastavení Fluvy pro všechny karty"
   },
   "page": {
     "menu": "Otevřít nabídku",
@@ -3102,7 +3113,12 @@
     "dashboard.up_to": "Až…",
     "dashboard.up_to_count": "Až {count} v každém seznamu",
     "cards.levels": "Ikony ukazují úroveň",
-    "cards.levels_sub": "Nabití baterie, čárky signálu, ventil otevřený nebo zavřený"
+    "cards.levels_sub": "Nabití baterie, čárky signálu, ventil otevřený nebo zavřený",
+    "cards.sheets_history": "Panely ukazují posledních 24 hodin",
+    "cards.exact": "Přesné barvy",
+    "cards.exact_sub": "Názvy barev tak, jak je kreslí Home Assistant, a hex kód tak, jak je zadán, ne odstíny palety",
+    "scope.activity_who": "Kdo to udělal",
+    "scope.activity_who_sub": "Každý záznam v Aktivitě uvádí osobu, která za ním stojí, s její fotkou; filtr podle osoby"
   },
   "customise": {
     "title": "Přizpůsobit",
@@ -3415,7 +3431,19 @@
     "editor.electric": "Elektřina",
     "editor.hybrid": "Plug-in hybrid",
     "editor.tank_size": "Objem nádrže",
-    "editor.tank_size_helper": "V jednotce obsahu nádrže (L, gal): její stav tam, kde auto hlásí jen obsah"
+    "editor.tank_size_helper": "V jednotce obsahu nádrže (L, gal): její stav tam, kde auto hlásí jen obsah",
+    "tyre_pressure_low": "Nízký tlak v pneumatikách",
+    "editor.tyre_decimals": "Desetinná místa tlaku pneumatik",
+    "editor.tyre_low": "Nízký tlak pneumatiky pod",
+    "editor.tyre_low_helper": "Tlak v jednotce pneumatik, entita, nebo šablona jako {{ states('sensor.x') }}",
+    "engine": "Motor",
+    "engine_running": "Běží",
+    "start_engine_confirm": "Nastartovat motor?",
+    "stop_engine_confirm": "Vypnout motor?",
+    "editor.show_head": "Zobrazit záhlaví",
+    "editor.show_hero": "Zobrazit baterii",
+    "editor.image_size": "Velikost obrázku",
+    "editor.image_size_helper": "Podíl šířky karty, například 50%, nebo výška, například 120px"
   },
   "expander": {
     "card": "Rozbalovač",
@@ -3663,8 +3691,8 @@
     "style": "Povrch",
     "panel": "Pruh",
     "card": "Karta",
-    "width_tablet": "Šířka na tabletu (px)",
-    "width_desktop": "Šířka na počítači (px)",
+    "width_tablet": "Šířka na tabletu",
+    "width_desktop": "Šířka na počítači",
     "phone": "Na telefonu",
     "top": "Nad pohledem",
     "drawer": "Zásuvka",
@@ -3681,7 +3709,9 @@
     "yaml": "Tento panel je psaný v YAML. Zkopírujte toto do jeho souboru, vedle views:",
     "copy": "Zkopírovat YAML",
     "copied": "YAML zkopírován",
-    "copy_failed": "Kopírování se nezdařilo: označte text a zkopírujte jej"
+    "copy_failed": "Kopírování se nezdařilo: označte text a zkopírujte jej",
+    "unit_screen": "% obrazovky",
+    "unit_dashboard": "% panelu"
   },
   "compass": {
     "direction": "Směr",
@@ -3699,7 +3729,9 @@
     "pointer_arrow": "Šipka",
     "arrow_points": "Šipka míří",
     "arrow_outward": "Ven",
-    "arrow_inward": "Dovnitř"
+    "arrow_inward": "Dovnitř",
+    "pointer_chevron": "Krokev",
+    "face": "Stupnice"
   },
   "schedule": {
     "card": "Plán vytápění",

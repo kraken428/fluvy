@@ -89,7 +89,15 @@
     "trigger.time_pattern": "wzorzec czasu",
     "trigger.time": "czas",
     "trigger.homeassistant_stopping": "zatrzymanie Home Assistanta",
-    "trigger.homeassistant_starting": "uruchomienie Home Assistanta"
+    "trigger.homeassistant_starting": "uruchomienie Home Assistanta",
+    "fact.who": "Kto",
+    "kind.account": "Konto",
+    "kind.integration": "Integracja",
+    "you": "Ty",
+    "by": "Kto: {name}",
+    "by_you": "Kto: ty",
+    "by_person": "Według osoby",
+    "everyone": "Wszyscy"
   },
   "alarm": {
     "arm_home": "Uzbrój (w domu)",
@@ -1373,7 +1381,10 @@
     "state_display": "Stan pokazany jako",
     "state_icons": "Ikony według stanu",
     "state_icons_helper": "W każdym wierszu stan i jego ikona (ok: mdi:check-circle-outline); stan niewymieniony zostaje słowami",
-    "state_icon_colors_helper": "W każdym wierszu stan i jego ton lub kolor (warning: warning)"
+    "state_icon_colors_helper": "W każdym wierszu stan i jego ton lub kolor (warning: warning)",
+    "horizontal": "Poziomy",
+    "exact_colors": "Dokładne kolory",
+    "exact_colors_helper": "Nazwy tak, jak rysuje je Home Assistant, kod hex tak, jak wpisano. Nieustawione: wspólne dla wszystkich kart, z ustawień Fluvy"
   },
   "energy": {
     "solar": "PV",
@@ -2449,7 +2460,7 @@
     "pref.language": "Język",
     "pref.auto": "Automatycznie",
     "pref.reduce": "Ogranicz animacje",
-    "pref.reduce_sub": "Zgodnie z ustawieniem urządzenia",
+    "pref.reduce_sub": "Niezależnie od ustawień urządzenia",
     "pref.hold": "Przytrzymaj, aby przesunąć",
     "pref.hold_sub": "Na ekranie dotykowym suwak rusza dopiero po krótkim przytrzymaniu",
     "pref.haptics": "Wibracje",
@@ -2775,7 +2786,12 @@
     "dashboard.up_to": "Do…",
     "dashboard.up_to_count": "Do {count} na listę",
     "cards.levels": "Ikony pokazują poziom",
-    "cards.levels_sub": "Naładowanie baterii, kreski sygnału, zawór otwarty lub zamknięty"
+    "cards.levels_sub": "Naładowanie baterii, kreski sygnału, zawór otwarty lub zamknięty",
+    "cards.sheets_history": "Ostatnie 24 godziny w szczegółach",
+    "cards.exact": "Dokładne kolory",
+    "cards.exact_sub": "Nazwy kolorów tak, jak rysuje je Home Assistant, i kod hex tak, jak wpisano, nie odcienie palety",
+    "scope.activity_who": "Kto to zrobił",
+    "scope.activity_who_sub": "Każdy wpis w Aktywności wskazuje osobę, która za nim stoi, z jej zdjęciem; filtr według osoby"
   },
   "customise": {
     "title": "Dostosowanie",
@@ -3361,7 +3377,19 @@
     "editor.electric": "Elektryczny",
     "editor.hybrid": "Hybryda plug-in",
     "editor.tank_size": "Pojemność zbiornika",
-    "editor.tank_size_helper": "W jednostce zawartości (L, gal): poziom tam, gdzie samochód podaje tylko zawartość"
+    "editor.tank_size_helper": "W jednostce zawartości (L, gal): poziom tam, gdzie samochód podaje tylko zawartość",
+    "tyre_pressure_low": "Niskie ciśnienie w oponach",
+    "editor.tyre_decimals": "Miejsca dziesiętne ciśnienia opon",
+    "editor.tyre_low": "Niskie ciśnienie opony poniżej",
+    "editor.tyre_low_helper": "Ciśnienie w jednostce opon, encja lub szablon, np. {{ states('sensor.x') }}",
+    "engine": "Silnik",
+    "engine_running": "Pracuje",
+    "start_engine_confirm": "Uruchomić silnik?",
+    "stop_engine_confirm": "Wyłączyć silnik?",
+    "editor.show_head": "Pokaż nagłówek",
+    "editor.show_hero": "Pokaż baterię",
+    "editor.image_size": "Rozmiar obrazu",
+    "editor.image_size_helper": "Część szerokości karty, np. 50%, lub wysokość, np. 120px"
   },
   "wall": {
     "paused": "Tryb ściany wstrzymany",
@@ -3728,8 +3756,8 @@
     "style": "Powierzchnia",
     "panel": "Panel",
     "card": "Karta",
-    "width_tablet": "Szerokość na tablecie (px)",
-    "width_desktop": "Szerokość na komputerze (px)",
+    "width_tablet": "Szerokość na tablecie",
+    "width_desktop": "Szerokość na komputerze",
     "phone": "Na telefonie",
     "top": "Nad widokiem",
     "drawer": "Szuflada",
@@ -3746,7 +3774,9 @@
     "yaml": "Ten pulpit jest zapisany w YAML. Skopiuj to do jego pliku, obok views:",
     "copy": "Kopiuj YAML",
     "copied": "YAML skopiowany",
-    "copy_failed": "Nie udało się skopiować: zaznacz tekst i skopiuj go"
+    "copy_failed": "Nie udało się skopiować: zaznacz tekst i skopiuj go",
+    "unit_screen": "% ekranu",
+    "unit_dashboard": "% pulpitu"
   },
   "compass": {
     "direction": "Kierunek",
@@ -3764,7 +3794,9 @@
     "pointer_arrow": "Strzałka",
     "arrow_points": "Strzałka wskazuje",
     "arrow_outward": "Na zewnątrz",
-    "arrow_inward": "Do środka"
+    "arrow_inward": "Do środka",
+    "pointer_chevron": "Szewron",
+    "face": "Tarcza"
   },
   "schedule": {
     "card": "Harmonogram ogrzewania",

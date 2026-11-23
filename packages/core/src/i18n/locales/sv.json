@@ -923,7 +923,15 @@
     "trigger.time_pattern": "tidsmönster",
     "trigger.time": "tid",
     "trigger.homeassistant_stopping": "Home Assistant stängs av",
-    "trigger.homeassistant_starting": "Home Assistant startar"
+    "trigger.homeassistant_starting": "Home Assistant startar",
+    "fact.who": "Vem",
+    "kind.account": "Konto",
+    "kind.integration": "Integration",
+    "you": "Du",
+    "by": "Av {name}",
+    "by_you": "Av dig",
+    "by_person": "Per person",
+    "everyone": "Alla"
   },
   "alerts": {
     "preset.low_battery": "Låga batterier",
@@ -2136,7 +2144,10 @@
     "state_display": "Tillstånd visas som",
     "state_icons": "Ikoner efter tillstånd",
     "state_icons_helper": "Ett tillstånd och dess ikon på varje rad (ok: mdi:check-circle-outline); ett tillstånd som inte står med behåller sina ord",
-    "state_icon_colors_helper": "Ett tillstånd och dess ton eller färg på varje rad (warning: warning)"
+    "state_icon_colors_helper": "Ett tillstånd och dess ton eller färg på varje rad (warning: warning)",
+    "horizontal": "Horisontell",
+    "exact_colors": "Exakta färger",
+    "exact_colors_helper": "Namn som Home Assistant ritar dem, en hexkod som den skrivs. Orört: som alla kort, från Fluvys inställningar"
   },
   "energy-period-card": {
     "name": "Energiperiod",
@@ -3181,7 +3192,12 @@
     "dashboard.up_to": "Upp till…",
     "dashboard.up_to_count": "Upp till {count} per lista",
     "cards.levels": "Ikoner visar nivån",
-    "cards.levels_sub": "Ett batteris laddning, en signals staplar, en ventil öppen eller stängd"
+    "cards.levels_sub": "Ett batteris laddning, en signals staplar, en ventil öppen eller stängd",
+    "cards.sheets_history": "Arken visar de senaste 24 timmarna",
+    "cards.exact": "Exakta färger",
+    "cards.exact_sub": "Färgnamn som Home Assistant ritar dem och en hexkod som den skrivs, inte palettens nyanser",
+    "scope.activity_who": "Vem som gjorde det",
+    "scope.activity_who_sub": "Varje post i Aktivitet visar personen bakom den, med bild; ett filter per person"
   },
   "remote": {
     "key.power": "Ström",
@@ -3321,8 +3337,8 @@
     "style": "Yta",
     "panel": "Panel",
     "card": "Kort",
-    "width_tablet": "Bredd på en surfplatta (px)",
-    "width_desktop": "Bredd på en dator (px)",
+    "width_tablet": "Bredd på en surfplatta",
+    "width_desktop": "Bredd på en dator",
     "phone": "På en telefon",
     "top": "Ovanför vyn",
     "drawer": "Låda",
@@ -3339,7 +3355,9 @@
     "yaml": "Den här kontrollpanelen är skriven i YAML. Kopiera detta till dess fil, bredvid views:",
     "copy": "Kopiera YAML",
     "copied": "YAML kopierad",
-    "copy_failed": "Kunde inte kopiera: markera texten och kopiera den"
+    "copy_failed": "Kunde inte kopiera: markera texten och kopiera den",
+    "unit_screen": "% av skärmen",
+    "unit_dashboard": "% av kontrollpanelen"
   },
   "sidebar": {
     "label": "Sidofält",
@@ -3597,7 +3615,19 @@
     "editor.electric": "El",
     "editor.hybrid": "Laddhybrid",
     "editor.tank_size": "Tankvolym",
-    "editor.tank_size_helper": "I enheten för det som finns i den (L, gal): dess nivå, där bilen bara anger hur mycket som finns i den"
+    "editor.tank_size_helper": "I enheten för det som finns i den (L, gal): dess nivå, där bilen bara anger hur mycket som finns i den",
+    "tyre_pressure_low": "Lågt däcktryck",
+    "editor.tyre_decimals": "Däcktryckets decimaler",
+    "editor.tyre_low": "Lågt däcktryck under",
+    "editor.tyre_low_helper": "Ett tryck i däckens enhet, en entitet eller en mall som {{ states('sensor.x') }}",
+    "engine": "Motor",
+    "engine_running": "Igång",
+    "start_engine_confirm": "Starta motorn?",
+    "stop_engine_confirm": "Stänga av motorn?",
+    "editor.show_head": "Visa huvudet",
+    "editor.show_hero": "Visa batteriet",
+    "editor.image_size": "Bildstorlek",
+    "editor.image_size_helper": "En andel av kortets bredd, till exempel 50%, eller en höjd, till exempel 120px"
   },
   "web": {
     "card": "Webbsida",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Pil",
     "arrow_points": "Pilen pekar",
     "arrow_outward": "Utåt",
-    "arrow_inward": "Inåt"
+    "arrow_inward": "Inåt",
+    "pointer_chevron": "Chevron",
+    "face": "Skala"
   },
   "schedule": {
     "card": "Värmeschema",

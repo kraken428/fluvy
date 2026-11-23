@@ -10,11 +10,13 @@ import {
   lookRule,
   parseChartSettings,
   parseSavedSeries,
+  parseSheetKinds,
   parseSliderSettings,
   resolveLanguage,
   setCardDefaults,
   setChartDefaults,
   setDetailsSheets,
+  setExactDefault,
   setLevelGlyphs,
   setLightDefaults,
   setSliderDefaults,
@@ -85,7 +87,8 @@ import { loadFixture, SHEETS, type FrameSpec, type SheetSpec } from './scenes.js
  *                        words under a bar or a liquid (`"words":"none"`), each read as the settings read it
  * ?sheets=fluvy         the house's details sheets (fluvy's settings → Appearance → Cards, #162): a card's more-info opens
  *                        Fluvy's own sheet for a light, a thermostat, a cover, a player or a fan; without it, as in a
- *                        house that keeps Home Assistant's dialog, every more-info is the mock's
+ *                        house that keeps Home Assistant's dialog, every more-info is the mock's; &sheetsday=light,climate
+ *                        the kinds whose sheets show their last 24 hours (#243: every kind where it names none)
  * ?hold=1               a person's hold to slide (fluvy's settings → Preferences, #166): on a touch screen (a phone, or
  *                        the browser's touch emulation) a slider moves only after a still press of 200 ms
  * ?levels=1             the house's icons show their level (fluvy's settings → Appearance › Cards, #226): a battery's
@@ -105,7 +108,8 @@ import { loadFixture, SHEETS, type FrameSpec, type SheetSpec } from './scenes.js
  * ?activity=1            Fluvy's Activity page on a made-up house (&live=0 without live entries,
  *                        &at=2026-09-17T21:47 the clock set to that moment, still running,
  *                        &card=1 its timeline on a card,
- *                        &moment=detail|burst|dates|sources|lights|week|nomatch|fresh|drop|loading|empty)
+ *                        &moment=detail|burst|dates|sources|lights|week|nomatch|fresh|drop|loading|empty,
+ *                        &who=1 who did each entry, with &moment=who|people|leo)
  * ?dashboard=home        a sheet's frames as a dashboard's view, under Home Assistant's header and its view tabs
  *                        (&tabs= &content= &tabtitle= &views= &icons= &edit= &subview= &scope= — see dashboard.ts)
  * ?dashboard=auto        the automatic dashboard's view (&view=home, its path), built by its own strategy from the
@@ -232,6 +236,9 @@ if (params.has('charts')) {
 if (['opacity', 'blur', 'unavailable', 'border'].some((name) => params.has(name)))
   setCardDefaults(cardsFor(params));
 
+// the house's colours as named (#250), as fluvy's settings would hand them to every card
+if (params.get('exact') === '1') setExactDefault(true);
+
 // the house's slider settings, as fluvy's settings would hand them to every card
 if (params.has('sliders'))
   setSliderDefaults(
@@ -257,8 +264,17 @@ const levels =
     : undefined;
 
 // the house's details, as fluvy's settings would say them: the playground starts no look, so nobody says, and a card's
-// details are Home Assistant's dialog (what every suite counts) until the page asks for Fluvy's sheets
-if (params.get('sheets') === 'fluvy') setDetailsSheets(detailsSheets(() => 'fluvy'));
+// details are Home Assistant's dialog (what every suite counts) until the page asks for Fluvy's sheets; the kinds
+// whose sheets show their last 24 hours (#243), every kind until the page names them
+if (params.get('sheets') === 'fluvy') {
+  const days = params.get('sheetsday');
+  setDetailsSheets(
+    detailsSheets(
+      () => 'fluvy',
+      () => (days === null ? undefined : parseSheetKinds(days.split(','))),
+    ),
+  );
+}
 
 // this device in Lite: the house's settings above, turned down as the look turns them down
 if (params.get('lite') === '1') {
@@ -329,6 +345,7 @@ if (activity)
     language,
     params.get('live') !== '0',
     (params.get('moment') ?? undefined) as ActivityMoment | undefined,
+    params.get('who') === '1',
   );
 // the wall: this page as a wall panel over the sheet's frames (`?sheet=home&wall=1&moment=asleep`)
 const wallMoment =

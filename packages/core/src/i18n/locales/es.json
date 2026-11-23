@@ -685,7 +685,10 @@
     "state_display": "Estado mostrado como",
     "state_icons": "Iconos por estado",
     "state_icons_helper": "Un estado y su icono en cada línea (ok: mdi:check-circle-outline); un estado no indicado conserva sus palabras",
-    "state_icon_colors_helper": "Un estado y su tono o color en cada línea (warning: warning)"
+    "state_icon_colors_helper": "Un estado y su tono o color en cada línea (warning: warning)",
+    "horizontal": "Horizontal",
+    "exact_colors": "Colores exactos",
+    "exact_colors_helper": "Los nombres como los dibuja Home Assistant, un código hex tal como se escribe. Sin tocar, el de todas las tarjetas en los ajustes de Fluvy"
   },
   "strategy": {
     "home": "Inicio",
@@ -850,7 +853,15 @@
     "trigger.time_pattern": "patrón horario",
     "trigger.time": "hora",
     "trigger.homeassistant_stopping": "Home Assistant deteniéndose",
-    "trigger.homeassistant_starting": "Home Assistant iniciándose"
+    "trigger.homeassistant_starting": "Home Assistant iniciándose",
+    "fact.who": "Quién",
+    "kind.account": "Cuenta",
+    "kind.integration": "Integración",
+    "you": "Tú",
+    "by": "Por {name}",
+    "by_you": "Por ti",
+    "by_person": "Por persona",
+    "everyone": "Todos"
   },
   "keypad": {
     "close": "Cerrar",
@@ -1675,7 +1686,12 @@
     "dashboard.up_to": "Hasta…",
     "dashboard.up_to_count": "Hasta {count} por lista",
     "cards.levels": "Los iconos muestran su nivel",
-    "cards.levels_sub": "La carga de una batería, las barras de una señal, una válvula abierta o cerrada"
+    "cards.levels_sub": "La carga de una batería, las barras de una señal, una válvula abierta o cerrada",
+    "cards.sheets_history": "Últimas 24 horas en los detalles",
+    "cards.exact": "Colores exactos",
+    "cards.exact_sub": "Los nombres de color como los dibuja Home Assistant y un código hex tal como se escribe, no los tonos de la paleta",
+    "scope.activity_who": "Quién fue",
+    "scope.activity_who_sub": "Cada entrada de Actividad nombra a la persona que la hizo, con su foto; un filtro por persona"
   },
   "customise": {
     "title": "Personalizar",
@@ -3435,7 +3451,19 @@
     "editor.electric": "Eléctrico",
     "editor.hybrid": "Híbrido enchufable",
     "editor.tank_size": "Capacidad del depósito",
-    "editor.tank_size_helper": "En la unidad de lo que contiene (L, gal): su nivel, cuando el coche solo dice lo que contiene"
+    "editor.tank_size_helper": "En la unidad de lo que contiene (L, gal): su nivel, cuando el coche solo dice lo que contiene",
+    "tyre_pressure_low": "Presión de neumáticos baja",
+    "editor.tyre_decimals": "Decimales de los neumáticos",
+    "editor.tyre_low": "Neumático bajo por debajo de",
+    "editor.tyre_low_helper": "Una presión en la unidad de los neumáticos, una entidad o una plantilla como {{ states('sensor.x') }}",
+    "engine": "Motor",
+    "engine_running": "En marcha",
+    "start_engine_confirm": "¿Arrancar el motor?",
+    "stop_engine_confirm": "¿Apagar el motor?",
+    "editor.show_head": "Mostrar la cabecera",
+    "editor.show_hero": "Mostrar la batería",
+    "editor.image_size": "Tamaño de la imagen",
+    "editor.image_size_helper": "Una parte del ancho de la tarjeta, como 50%, o una altura, como 120px"
   },
   "remote": {
     "key.power": "Encendido",
@@ -3603,8 +3631,8 @@
     "style": "Superficie",
     "panel": "Banda",
     "card": "Tarjeta",
-    "width_tablet": "Ancho en una tableta (px)",
-    "width_desktop": "Ancho en un ordenador (px)",
+    "width_tablet": "Ancho en una tableta",
+    "width_desktop": "Ancho en un ordenador",
     "phone": "En un móvil",
     "top": "Sobre la vista",
     "drawer": "Cajón",
@@ -3621,7 +3649,9 @@
     "yaml": "Este panel está escrito en YAML. Copia esto en su archivo, junto a views:",
     "copy": "Copiar el YAML",
     "copied": "YAML copiado",
-    "copy_failed": "No se pudo copiar: selecciona el texto y cópialo"
+    "copy_failed": "No se pudo copiar: selecciona el texto y cópialo",
+    "unit_screen": "% de la pantalla",
+    "unit_dashboard": "% del panel"
   },
   "compass": {
     "direction": "Dirección",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Flecha",
     "arrow_points": "La flecha apunta",
     "arrow_outward": "Hacia fuera",
-    "arrow_inward": "Hacia dentro"
+    "arrow_inward": "Hacia dentro",
+    "pointer_chevron": "Cheurón",
+    "face": "Esfera"
   },
   "schedule": {
     "card": "Calendario de calefacción",

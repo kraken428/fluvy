@@ -635,7 +635,10 @@
     "state_display": "Állapot megjelenítése",
     "state_icons": "Ikonok állapot szerint",
     "state_icons_helper": "Soronként egy állapot és az ikonja (ok: mdi:check-circle-outline); a fel nem sorolt állapot szavakkal marad",
-    "state_icon_colors_helper": "Soronként egy állapot és a tónusa vagy színe (warning: warning)"
+    "state_icon_colors_helper": "Soronként egy állapot és a tónusa vagy színe (warning: warning)",
+    "horizontal": "Vízszintes",
+    "exact_colors": "Pontos színek",
+    "exact_colors_helper": "A nevek úgy, ahogy a Home Assistant rajzolja őket, a hex kód úgy, ahogy beírták. Érintetlenül: az összes kártyáé, a Fluvy beállításaiból"
   },
   "strategy": {
     "home": "Otthon",
@@ -1284,7 +1287,15 @@
     "trigger.time_pattern": "időminta",
     "trigger.time": "idő",
     "trigger.homeassistant_stopping": "a Home Assistant leáll",
-    "trigger.homeassistant_starting": "a Home Assistant elindul"
+    "trigger.homeassistant_starting": "a Home Assistant elindul",
+    "fact.who": "Ki",
+    "kind.account": "Fiók",
+    "kind.integration": "Integráció",
+    "you": "Te",
+    "by": "Ki: {name}",
+    "by_you": "Ki: te",
+    "by_person": "Személy szerint",
+    "everyone": "Mindenki"
   },
   "alerts": {
     "preset.low_battery": "Gyenge elemek",
@@ -3119,7 +3130,12 @@
     "dashboard.up_to": "Legfeljebb…",
     "dashboard.up_to_count": "Listánként legfeljebb {count}",
     "cards.levels": "Az ikonok mutatják a szintet",
-    "cards.levels_sub": "Az akkumulátor töltöttsége, a jel sávjai, a szelep nyitva vagy zárva"
+    "cards.levels_sub": "Az akkumulátor töltöttsége, a jel sávjai, a szelep nyitva vagy zárva",
+    "cards.sheets_history": "Az elmúlt 24 óra a részleteknél",
+    "cards.exact": "Pontos színek",
+    "cards.exact_sub": "A színnevek úgy, ahogy a Home Assistant rajzolja őket, a hex kód úgy, ahogy beírták, nem a paletta árnyalatai",
+    "scope.activity_who": "Ki csinálta",
+    "scope.activity_who_sub": "A Tevékenység minden bejegyzése megnevezi a mögötte álló személyt, a képével; szűrés személy szerint"
   },
   "customise": {
     "title": "Testreszabás",
@@ -3435,7 +3451,19 @@
     "editor.electric": "Elektromos",
     "editor.hybrid": "Konnektoros hibrid",
     "editor.tank_size": "Tankméret",
-    "editor.tank_size_helper": "A tartalom mértékegységében (L, gal): a szintje, ha az autó csak a tartalmát jelzi"
+    "editor.tank_size_helper": "A tartalom mértékegységében (L, gal): a szintje, ha az autó csak a tartalmát jelzi",
+    "tyre_pressure_low": "Alacsony guminyomás",
+    "editor.tyre_decimals": "A guminyomás tizedesjegyei",
+    "editor.tyre_low": "Alacsony guminyomás ez alatt",
+    "editor.tyre_low_helper": "Nyomás a gumik mértékegységében, egy entitás vagy egy sablon, például {{ states('sensor.x') }}",
+    "engine": "Motor",
+    "engine_running": "Jár",
+    "start_engine_confirm": "Beindítod a motort?",
+    "stop_engine_confirm": "Leállítod a motort?",
+    "editor.show_head": "Fejléc megjelenítése",
+    "editor.show_hero": "Az akku megjelenítése",
+    "editor.image_size": "A kép mérete",
+    "editor.image_size_helper": "A kártya szélességének része, például 50%, vagy egy magasság, például 120px"
   },
   "remote": {
     "key.power": "Be/ki",
@@ -3603,8 +3631,8 @@
     "style": "Felület",
     "panel": "Sáv",
     "card": "Kártya",
-    "width_tablet": "Szélesség táblagépen (px)",
-    "width_desktop": "Szélesség asztali gépen (px)",
+    "width_tablet": "Szélesség táblagépen",
+    "width_desktop": "Szélesség asztali gépen",
     "phone": "Telefonon",
     "top": "A nézet fölött",
     "drawer": "Fiók",
@@ -3621,7 +3649,9 @@
     "yaml": "Ez a vezérlőpult YAML-ben van megírva. Másold be ezt a fájljába, a views: mellé",
     "copy": "YAML másolása",
     "copied": "A YAML átmásolva",
-    "copy_failed": "Nem sikerült másolni: jelöld ki a szöveget, és másold ki"
+    "copy_failed": "Nem sikerült másolni: jelöld ki a szöveget, és másold ki",
+    "unit_screen": "A képernyő %-a",
+    "unit_dashboard": "A vezérlőpult %-a"
   },
   "compass": {
     "direction": "Irány",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Nyíl",
     "arrow_points": "A nyíl iránya",
     "arrow_outward": "Kifelé",
-    "arrow_inward": "Befelé"
+    "arrow_inward": "Befelé",
+    "pointer_chevron": "Szarufa",
+    "face": "Számlap"
   },
   "schedule": {
     "card": "Fűtési ütemterv",

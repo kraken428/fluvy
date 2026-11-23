@@ -999,7 +999,15 @@
     "trigger.time_pattern": "временной цикл",
     "trigger.time": "время",
     "trigger.homeassistant_stopping": "Home Assistant останавливается",
-    "trigger.homeassistant_starting": "Home Assistant запускается"
+    "trigger.homeassistant_starting": "Home Assistant запускается",
+    "fact.who": "Кто",
+    "kind.account": "Учётная запись",
+    "kind.integration": "Интеграция",
+    "you": "Вы",
+    "by": "Кто: {name}",
+    "by_you": "Кто: вы",
+    "by_person": "По человеку",
+    "everyone": "Все"
   },
   "alerts": {
     "preset.low_battery": "Низкий заряд",
@@ -2127,7 +2135,10 @@
     "state_display": "Вид состояния",
     "state_icons": "Иконки по состояниям",
     "state_icons_helper": "В каждой строке состояние и его иконка (ok: mdi:check-circle-outline); состояние не из списка остаётся словами",
-    "state_icon_colors_helper": "В каждой строке состояние и его тон или цвет (warning: warning)"
+    "state_icon_colors_helper": "В каждой строке состояние и его тон или цвет (warning: warning)",
+    "horizontal": "Горизонтальный",
+    "exact_colors": "Точные цвета",
+    "exact_colors_helper": "Названия так, как их рисует Home Assistant, hex-код как введён. Не задано: как у всех карточек в настройках Fluvy"
   },
   "energy-period-card": {
     "name": "Период энергии",
@@ -3168,7 +3179,12 @@
     "dashboard.up_to": "До…",
     "dashboard.up_to_count": "До {count} в списке",
     "cards.levels": "Значки показывают уровень",
-    "cards.levels_sub": "Заряд батареи, деления сигнала, клапан открыт или закрыт"
+    "cards.levels_sub": "Заряд батареи, деления сигнала, клапан открыт или закрыт",
+    "cards.sheets_history": "Последние 24 часа в подробностях",
+    "cards.exact": "Точные цвета",
+    "cards.exact_sub": "Названия цветов так, как их рисует Home Assistant, и hex-код как введён, а не оттенки палитры",
+    "scope.activity_who": "Кто это сделал",
+    "scope.activity_who_sub": "Каждая запись «Активности» называет человека, который за ней стоит, с его фото; фильтр по человеку"
   },
   "customise": {
     "title": "Настройка",
@@ -3565,7 +3581,19 @@
     "editor.electric": "Электричество",
     "editor.hybrid": "Подключаемый гибрид",
     "editor.tank_size": "Объём бака",
-    "editor.tank_size_helper": "В единицах содержимого (L, gal): уровень, если автомобиль сообщает только содержимое"
+    "editor.tank_size_helper": "В единицах содержимого (L, gal): уровень, если автомобиль сообщает только содержимое",
+    "tyre_pressure_low": "Низкое давление в шинах",
+    "editor.tyre_decimals": "Знаков после запятой: шины",
+    "editor.tyre_low": "Порог низкого давления в шинах",
+    "editor.tyre_low_helper": "Давление в единицах шин, объект или шаблон, например {{ states('sensor.x') }}",
+    "engine": "Двигатель",
+    "engine_running": "Работает",
+    "start_engine_confirm": "Запустить двигатель?",
+    "stop_engine_confirm": "Заглушить двигатель?",
+    "editor.show_head": "Показывать заголовок",
+    "editor.show_hero": "Показывать батарею",
+    "editor.image_size": "Размер изображения",
+    "editor.image_size_helper": "Доля ширины карточки, например 50%, или высота, например 120px"
   },
   "expander": {
     "card": "Раскрывающийся блок",
@@ -3729,8 +3757,8 @@
     "style": "Поверхность",
     "panel": "Полоса",
     "card": "Карточка",
-    "width_tablet": "Ширина на планшете (px)",
-    "width_desktop": "Ширина на компьютере (px)",
+    "width_tablet": "Ширина на планшете",
+    "width_desktop": "Ширина на компьютере",
     "phone": "На телефоне",
     "top": "Над видом",
     "drawer": "Выдвижная",
@@ -3747,7 +3775,9 @@
     "yaml": "Эта панель написана на YAML. Скопируйте это в её файл, рядом с views:",
     "copy": "Копировать YAML",
     "copied": "YAML скопирован",
-    "copy_failed": "Не удалось скопировать: выделите текст и скопируйте его вручную"
+    "copy_failed": "Не удалось скопировать: выделите текст и скопируйте его вручную",
+    "unit_screen": "% экрана",
+    "unit_dashboard": "% панели"
   },
   "compass": {
     "direction": "Направление",
@@ -3765,7 +3795,9 @@
     "pointer_arrow": "Стрелка",
     "arrow_points": "Стрелка указывает",
     "arrow_outward": "Наружу",
-    "arrow_inward": "Внутрь"
+    "arrow_inward": "Внутрь",
+    "pointer_chevron": "Шеврон",
+    "face": "Шкала"
   },
   "schedule": {
     "card": "График отопления",

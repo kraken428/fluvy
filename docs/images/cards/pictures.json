@@ -229,6 +229,11 @@
     "width": 784,
     "height": 352
   },
+  "cover.horizontal": {
+    "example": "eede04ff56c0",
+    "width": 784,
+    "height": 968
+  },
   "fan": {
     "example": "ef3bd1ccf2c9",
     "width": 784,
@@ -506,6 +511,11 @@
   },
   "chips": {
     "example": "312d13f8bb88",
+    "width": 784,
+    "height": 152
+  },
+  "chips.plain": {
+    "example": "f0c073665b84",
     "width": 784,
     "height": 152
   },

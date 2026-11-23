@@ -24,8 +24,10 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   attribute: 'The attribute of the sensor that holds the list of items.',
   badge_entity: 'An entity whose value the head’s badge shows.',
   badge_label: 'The words before the badge entity’s value ("Health 92 %").',
-  badge_ok: 'The head’s badge while no row is outside its range.',
-  badge_warn: 'The head’s badge while rows are outside their range; {count} is how many.',
+  badge_ok:
+    'The head’s badge while no row is outside its range: your own words, an entity’s state or a template.',
+  badge_warn:
+    'The head’s badge while rows are outside their range, as `badge_ok`; {count} is how many.',
   battery_entity: 'The battery sensor the card reads its charge from.',
   camera_view: 'Shows still pictures that refresh by themselves, or Home Assistant’s live stream.',
   card_blur:
@@ -78,6 +80,8 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   empty_text: 'What the card says while it has nothing to show.',
   end_hour: 'The hour the timeline ends at.',
   entity: 'The entity the card is about: what it shows, and what its controls act on.',
+  exact_colors:
+    'Wears the colours the card names as Home Assistant draws them and a hex as typed, not the palette’s tones. Left out, the house’s.',
   exclude: 'Leaves these entities, devices or domains out of what the card counts.',
   expanded: 'Opens the card as the page loads; off, it starts folded.',
   export: 'A sensor of the power going out to the grid, positive.',
@@ -414,6 +418,8 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   'automations.show': 'Lists every automation, or only Fluvy’s schedules.',
   'automations.show_switch': 'Shows each automation’s switch.',
   'automations.sort': 'Orders the automations by name, by the next run, or by the last.',
+  'bars.badge':
+    'The head’s badge whatever the rows say: your own words, an entity’s state or a template; {count} is how many rows are outside their range. Where it says nothing, `badge_ok` or `badge_warn` does.',
   'bars.chart': 'The bars’ style.',
   'batteries.mode': 'A select entity of the batteries’ mode, shown as tiles to choose from.',
   'calendar.days': 'How many days ahead the agenda shows.',
@@ -424,6 +430,10 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   'chart.show_head': 'Shows the value now, large, over the chart.',
   'chart.show_legend': 'Shows the legend under the chart.',
   'chips.tint': 'When each chip shows its colour.',
+  'chips.style':
+    'Draws each chip as a pill, or plain on the page with no pill at rest, the open view’s chip keeping its own.',
+  'chips.show_name':
+    'Shows each chip’s name; hidden, a chip with an icon shows it alone, its name read aloud and shown under the pointer.',
   'clock.title': 'A title over the clock, such as the city it shows.',
   'clock.weather':
     'A weather entity: its condition and temperature, and the sky’s tone on the face.',
@@ -618,20 +628,34 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   'timer.entity': 'The timer the card shows and controls.',
   'updates.entities': 'The update entities the card lists; left out, every one of the house.',
   'vacuum.show_battery': 'Shows the robot’s battery.',
+  'vehicle.badge':
+    'Words, an entity’s state or a template of your own in the head’s badge, in place of what the car is doing.',
   'vehicle.energy':
     'What the car runs on: its battery, its tank, or both; automatic, its tank where it has one and no battery, else its battery.',
   'vehicle.entity':
     'An entity of the car, where its device is not named: the device is found from it.',
   'vehicle.image':
     'A picture of the car: an address, an entity whose picture it is, or the integration’s own.',
+  'vehicle.image_size':
+    'The picture’s size over the battery: a share of the card’s width (50%) or a height (120px), the card’s height following it.',
+  'vehicle.quick_state_position':
+    'Where the quick actions’ states stand: under their icons, their line taller, or beside them, the rounds wider.',
+  'vehicle.show_head': 'Shows the head: the car, its name, where it is and what it is doing.',
+  'vehicle.show_hero': 'Shows the battery or the tank, or a plug-in hybrid’s both.',
+  'vehicle.show_quick_states':
+    'Shows every quick action’s state in its round, unless the action says otherwise.',
   'vehicle.show_status':
     'Shows the line under the battery or the tank: when it is full, why it is not charging, a low range.',
   'vehicle.tank_size':
     'The tank’s size, so that a car which says only how much is in it shows its level.',
+  'vehicle.tyre_decimals':
+    'The decimals every tyre’s pressure is written with; automatic, their sensors’ own, else one under 10.',
+  'vehicle.tyre_low':
+    'The pressure under which a tyre is low, in the tyres’ unit: a number, an entity or a template; a low tyre is marked and said on the line.',
   'weather.days': 'How many days the forecast shows.',
   'weather.entity': 'The weather entity the card shows.',
   'compass.arrow_points':
-    'Which way an arrow points, the bearing’s and the second’s: out from the centre to the bearing, as a compass needle’s head, or in at the figure, as the wind blows from it.',
+    'Which way an arrow or a chevron points, the bearing’s and the second’s: out from the centre to the bearing, as a compass needle’s head, or in at the figure, as the wind blows from it.',
   'compass.badge':
     'The words in the head’s badge: your own, an entity’s state or a template; none by default.',
   'compass.direction_attribute':
@@ -640,8 +664,10 @@ export const MEANINGS: Readonly<Record<string, string>> = {
     'The bearing: a state in degrees or in English letters (N, NNE … NNW), the sun’s azimuth, a weather entity’s wind.',
   'compass.entity':
     'The figure in the ring beside `direction_entity`, such as the wind’s speed; alone, it is read as the bearing.',
+  'compass.face':
+    'The ring’s look: a classic compass’s, a band with the ticks across it and the letters large outside it; or the ring of ticks alone, the letters small in their place.',
   'compass.indicator':
-    'How the bearing is marked: an arrow across the ring, the knob on the ring, the ticks lit across it, or a dot outside them.',
+    'How the bearing is marked: an arrow across the ring, a chevron in a ringed circle on it, the knob on the ring, the ticks lit across it, or a dot.',
   'compass.label': 'The words inside the ring, over the figure.',
   'compass.north_offset':
     'Where north is drawn, in degrees clockwise from the top, for a window that does not face north.',
@@ -651,7 +677,7 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   'compass.secondary_indicator': 'How the second bearing is marked.',
   'compass.show_cardinals': 'Writes N, E, S and W in the ring, in the page’s language.',
   'compass.show_stats': 'Shows the row of readouts under the ring.',
-  'compass.show_ticks': 'Draws the ring’s ticks.',
+  'compass.show_ticks': 'Draws the ring’s ticks, the cardinal points’ bars with them.',
   'compass.tint':
     'Whether the card itself takes the colour of the threshold its figure is past: never, or while it is past one.',
   'compass.tint_style': 'How that colour is shown: a wash over the card, or the card’s edge.',
@@ -731,7 +757,10 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   'stat-tiles.tiles[]': 'The figures as tiles, in this order.',
   'template.readouts[]': 'Sensors shown as readouts on the tile, in this order.',
   'tile.readouts[]': 'Sensors shown as readouts on the tile, in this order.',
-  'vehicle.controls[]': 'The car’s controls, each a round that acts on it.',
+  'vehicle.controls[]':
+    'The car’s controls, each a round that acts on it, and entities of your own among them.',
+  'vehicle.quick_actions[]':
+    'Small rounds at the card’s foot, each an entity with its own icon, colour and actions: a sensor, a door, a script.',
   'vehicle.rows[]': 'The rows of readings under the battery or the tank, in this order.',
   'compass.stats[]': 'Up to three sensors read out under the compass, in this order.',
 
@@ -754,7 +783,6 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   '[].color': 'The item’s colour, in place of the one the card gives it.',
   '[].conditions': 'Conditions under which the alert counts at all.',
   '[].confirm': 'Asks before the control acts.',
-  '[].control': 'What the control switches.',
   '[].cost_entity': 'A cost sensor for this device, said after its share.',
   '[].count_by': 'Counts the entities, or the devices they belong to.',
   '[].curve': 'How this series’ line joins its readings.',
@@ -779,7 +807,7 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   '[].group':
     'What the quick action acts on: the room’s lights, covers, fans or media, or one entity.',
   '[].hidden': 'Counts hidden entities too.',
-  '[].high': 'Above this value the row turns to a warning.',
+  '[].high': 'Above this value the row turns to a warning: a figure, an entity or a template.',
   '[].highlight': 'Fills the tile with its tone: the one figure that matters most.',
   '[].hold_action': 'What a long press on the item does.',
   '[].icon': 'The item’s own icon, in place of the one the card would give it.',
@@ -798,10 +826,10 @@ export const MEANINGS: Readonly<Record<string, string>> = {
     'What the band is called, said beside the reading so that colour is never all that says it.',
   '[].labels': 'Names of your own for the options.',
   '[].level': 'A sensor of its state of charge.',
-  '[].low': 'Below this value the row turns to a warning.',
+  '[].low': 'Below this value the row turns to a warning: a figure, an entity or a template.',
   '[].match': 'Further groups of conditions, any of which may match.',
-  '[].max': 'The top of the row’s bar.',
-  '[].min': 'The bottom of the row’s bar.',
+  '[].max': 'The top of the row’s bar: a figure, an entity or a template.',
+  '[].min': 'The bottom of the row’s bar: a figure, an entity or a template.',
   '[].min_count': 'Shows the alert from this many matches up.',
   '[].motion': 'The motion sensor the camera’s line reads.',
   '[].name': 'The item’s own name, in place of the one the card would give it.',
@@ -885,6 +913,8 @@ export const MEANINGS: Readonly<Record<string, string>> = {
   'chart.series[].state_colors':
     'A series of states’ colour for each of its states: a tone, none for the strip’s own fill, or a colour of your own.',
   'chart.series[].unit': 'The unit this series is written in.',
+  'chips.chips[].show_name': 'Shows this chip’s name, or its icon alone, whatever the card says.',
+  'chips.chips[].style': 'Draws this chip as a pill, or plain, whatever the card says.',
   'energy.legend[].period': 'What the legend’s figure shows.',
   'energy-sankey.devices[].parent': 'Another device’s meter this device is part of.',
   'energy-usage.meters[].entity': 'The meter’s statistic.',
@@ -925,5 +955,11 @@ export const MEANINGS: Readonly<Record<string, string>> = {
     'The preset’s key: comfort, eco, away, home, sleep, boost, activity, or the name of one of your own.',
   'thermostats.thermostats[].rounds':
     'Rounds of its own after the one that opens it, each an entity with its own icon and actions: a schedule’s view, a window.',
+  'vehicle.controls[].control':
+    'One of the car’s controls; `entity`, or none, for the item’s entity of your own.',
+  'vehicle.controls[].entity':
+    'An entity of your own in the row: a switch, a button, a script, a scene, its name under its round.',
+  'vehicle.quick_actions[].show_state':
+    'Shows this quick action’s state in its round, or hides it, whatever the card says.',
   'vehicle.roles[].role': 'What the entity is to the car.',
 };

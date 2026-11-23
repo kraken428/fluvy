@@ -13,12 +13,14 @@ import {
   parsePersonal,
   parseRooms,
   parseSavedPalettes,
+  parseSheetKinds,
   parseSliderSettings,
   parseWall,
   PERSONAL_DEFAULTS,
   resolveSettings,
   SettingsStore,
   SETTINGS_VERSION,
+  SHEET_KINDS,
   SLIDER_DEFAULTS,
   pageScope,
   WALL_DEFAULTS,
@@ -65,6 +67,7 @@ describe('parsing stored settings', () => {
         frame: false,
         icons: { sidebar: false, settings: true },
         activity: false,
+        activityWho: true,
         history: false,
         details: false,
         tabs: { style: 'pills', content: 'icons', title: false },
@@ -83,9 +86,12 @@ describe('parsing stored settings', () => {
         statuses: { warning: '#DC630B', danger: 'red' },
         cards: { opacity: 60, blur: false, unavailable: 'quiet', border: false },
         sheets: 'home-assistant',
+        // a kind once, in their order, nothing that is not one
+        sheetsHistory: ['fan', 'light', 'fan', 'switch', 3],
         // an area's id once, nothing that is not one
         rooms: { sort: 'name', order: ['kitchen', 'kitchen', 3, '', 'hall'] },
         levelIcons: true,
+        exactColors: true,
         extra: true,
       }),
     ).toEqual({
@@ -106,6 +112,7 @@ describe('parsing stored settings', () => {
       frame: false,
       icons: { sidebar: false, settings: true },
       activity: false,
+      activityWho: true,
       history: false,
       details: false,
       palettes: [],
@@ -121,8 +128,10 @@ describe('parsing stored settings', () => {
       sliders: SLIDER_DEFAULTS,
       background: BACKGROUND_DEFAULTS,
       sheets: 'home-assistant',
+      sheetsHistory: ['light', 'fan'],
       rooms: { sort: 'name', order: ['kitchen', 'hall'] },
       levelIcons: true,
+      exactColors: true,
     });
   });
 
@@ -248,7 +257,6 @@ describe('parsing stored settings', () => {
     const upgraded = parseHouse({ version: 7, palette: 'volt' });
     expect(upgraded.levelIcons).toBe(false);
     expect(upgraded.version).toBe(SETTINGS_VERSION);
-    expect(SETTINGS_VERSION).toBe(8);
     expect(HOUSE_DEFAULTS.levelIcons).toBe(false);
     // only a true turns them on
     for (const broken of ['true', 1, null, {}])
@@ -257,6 +265,55 @@ describe('parsing stored settings', () => {
     expect(resolveSettings(parseHouse({ levelIcons: true }), PERSONAL_DEFAULTS).levelIcons).toBe(
       true,
     );
+  });
+
+  it('reads whether the Activity view shows who did it: off where an 8 stored none (1.25: nothing changes on upgrade)', () => {
+    // a 1.24 house stored none: every entry with its cause alone, as before
+    const upgraded = parseHouse({ version: 8, palette: 'volt', activity: true });
+    expect(upgraded.activityWho).toBe(false);
+    expect(upgraded.version).toBe(SETTINGS_VERSION);
+    expect(SETTINGS_VERSION).toBe(9);
+    expect(HOUSE_DEFAULTS.activityWho).toBe(false);
+    // only a true turns it on
+    for (const broken of ['true', 1, null, {}])
+      expect(parseHouse({ activityWho: broken }).activityWho).toBe(false);
+    // the house's, whoever reads the page
+    expect(resolveSettings(parseHouse({ activityWho: true }), PERSONAL_DEFAULTS).activityWho).toBe(
+      true,
+    );
+  });
+
+  it('reads whether the cards wear their colours as named: off where an 8 stored none (1.25, #250: nothing changes on upgrade)', () => {
+    // a 1.24 house stored none: every colour a card names in the palette's tone of it, as before
+    const upgraded = parseHouse({ version: 8, palette: 'volt' });
+    expect(upgraded.exactColors).toBe(false);
+    expect(upgraded.version).toBe(SETTINGS_VERSION);
+    expect(SETTINGS_VERSION).toBe(9);
+    expect(HOUSE_DEFAULTS.exactColors).toBe(false);
+    // only a true turns them on
+    for (const broken of ['true', 1, null, {}])
+      expect(parseHouse({ exactColors: broken }).exactColors).toBe(false);
+    // the house's, whoever looks
+    expect(resolveSettings(parseHouse({ exactColors: true }), PERSONAL_DEFAULTS).exactColors).toBe(
+      true,
+    );
+  });
+
+  it('reads which kinds’ sheets show their last 24 hours: every kind where an 8 stored none (1.25, #243: nothing changes on upgrade)', () => {
+    // a 1.24 house stored none: every sheet shows its day, as before
+    const upgraded = parseHouse({ version: 8, palette: 'volt' });
+    expect(upgraded.sheetsHistory).toEqual(['light', 'climate', 'cover', 'media', 'fan']);
+    expect(upgraded.version).toBe(SETTINGS_VERSION);
+    expect(SETTINGS_VERSION).toBe(9);
+    expect(HOUSE_DEFAULTS.sheetsHistory).toEqual(SHEET_KINDS);
+    // none chosen is none; anything but a list is every kind
+    expect(parseSheetKinds([])).toEqual([]);
+    for (const broken of ['light', null, { light: true }, 3])
+      expect(parseSheetKinds(broken)).toEqual(SHEET_KINDS);
+    // the house's, whoever looks
+    expect(
+      resolveSettings(parseHouse({ sheetsHistory: ['climate'] }), PERSONAL_DEFAULTS).sheetsHistory,
+    ).toEqual(['climate']);
   });
 
   it('reads the cards’ surface, each broken field as solid and blurred (1.15: nothing changes on upgrade)', () => {

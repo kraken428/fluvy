@@ -685,7 +685,10 @@
     "state_display": "Zustand anzeigen als",
     "state_icons": "Symbole nach Zustand",
     "state_icons_helper": "Pro Zeile ein Zustand und sein Symbol (ok: mdi:check-circle-outline); ein nicht genannter Zustand bleibt in Worten",
-    "state_icon_colors_helper": "Pro Zeile ein Zustand und sein Farbton oder seine Farbe (warning: warning)"
+    "state_icon_colors_helper": "Pro Zeile ein Zustand und sein Farbton oder seine Farbe (warning: warning)",
+    "horizontal": "Horizontal",
+    "exact_colors": "Exakte Farben",
+    "exact_colors_helper": "Namen wie in Home Assistant, Hex-Werte wie eingegeben. Unverändert: wie in den Fluvy-Einstellungen für alle Karten"
   },
   "strategy": {
     "home": "Zuhause",
@@ -850,7 +853,15 @@
     "trigger.time_pattern": "Zeitmuster",
     "trigger.time": "Uhrzeit",
     "trigger.homeassistant_stopping": "Home Assistant fährt herunter",
-    "trigger.homeassistant_starting": "Home Assistant startet"
+    "trigger.homeassistant_starting": "Home Assistant startet",
+    "fact.who": "Wer",
+    "kind.account": "Benutzer",
+    "kind.integration": "Integration",
+    "you": "Du",
+    "by": "Von {name}",
+    "by_you": "Von dir",
+    "by_person": "Nach Person",
+    "everyone": "Alle"
   },
   "keypad": {
     "close": "Schließen",
@@ -1675,7 +1686,12 @@
     "dashboard.up_to": "Bis zu…",
     "dashboard.up_to_count": "Bis zu {count} je Liste",
     "cards.levels": "Symbole zeigen den Stand",
-    "cards.levels_sub": "Ladung einer Batterie, Balken eines Signals, ein Ventil offen oder geschlossen"
+    "cards.levels_sub": "Ladung einer Batterie, Balken eines Signals, ein Ventil offen oder geschlossen",
+    "cards.sheets_history": "Ansichten zeigen die letzten 24 Stunden",
+    "cards.exact": "Exakte Farben",
+    "cards.exact_sub": "Farbnamen wie in Home Assistant und Hex-Werte wie eingegeben, nicht die Töne der Palette",
+    "scope.activity_who": "Wer es war",
+    "scope.activity_who_sub": "Jeder Eintrag in Aktivität nennt die Person dahinter, mit ihrem Bild; ein Filter nach Person"
   },
   "customise": {
     "title": "Anpassen",
@@ -3435,7 +3451,19 @@
     "editor.electric": "Elektrisch",
     "editor.hybrid": "Plug-in-Hybrid",
     "editor.tank_size": "Tankgröße",
-    "editor.tank_size_helper": "In der Einheit des Tankinhalts (L, gal): sein Füllstand, wo das Auto nur den Inhalt meldet"
+    "editor.tank_size_helper": "In der Einheit des Tankinhalts (L, gal): sein Füllstand, wo das Auto nur den Inhalt meldet",
+    "tyre_pressure_low": "Niedriger Reifendruck",
+    "editor.tyre_decimals": "Dezimalstellen des Reifendrucks",
+    "editor.tyre_low": "Niedriger Reifendruck unter",
+    "editor.tyre_low_helper": "Ein Druck in der Einheit der Reifen, eine Entität oder ein Template wie {{ states('sensor.x') }}",
+    "engine": "Motor",
+    "engine_running": "Läuft",
+    "start_engine_confirm": "Motor starten?",
+    "stop_engine_confirm": "Motor abstellen?",
+    "editor.show_head": "Kopfzeile anzeigen",
+    "editor.show_hero": "Batterie anzeigen",
+    "editor.image_size": "Bildgröße",
+    "editor.image_size_helper": "Ein Anteil der Kartenbreite wie 50% oder eine Höhe wie 120px"
   },
   "remote": {
     "key.power": "Ein/Aus",
@@ -3603,8 +3631,8 @@
     "style": "Fläche",
     "panel": "Leiste",
     "card": "Karte",
-    "width_tablet": "Breite auf einem Tablet (px)",
-    "width_desktop": "Breite auf einem Desktop (px)",
+    "width_tablet": "Breite auf einem Tablet",
+    "width_desktop": "Breite auf einem Desktop",
     "phone": "Auf einem Smartphone",
     "top": "Über der Ansicht",
     "drawer": "Ausklappmenü",
@@ -3621,7 +3649,9 @@
     "yaml": "Dieses Dashboard ist in YAML geschrieben. Kopiere das in seine Datei, neben views:",
     "copy": "YAML kopieren",
     "copied": "YAML kopiert",
-    "copy_failed": "Kopieren nicht möglich: Text markieren und kopieren"
+    "copy_failed": "Kopieren nicht möglich: Text markieren und kopieren",
+    "unit_screen": "% des Bildschirms",
+    "unit_dashboard": "% des Dashboards"
   },
   "compass": {
     "direction": "Richtung",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Pfeil",
     "arrow_points": "Pfeil zeigt",
     "arrow_outward": "Nach außen",
-    "arrow_inward": "Nach innen"
+    "arrow_inward": "Nach innen",
+    "pointer_chevron": "Chevron",
+    "face": "Skala"
   },
   "schedule": {
     "card": "Heizplan",

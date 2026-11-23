@@ -635,7 +635,10 @@
     "state_display": "状態の表示",
     "state_icons": "状態ごとのアイコン",
     "state_icons_helper": "1行に状態とそのアイコン（ok: mdi:check-circle-outline）。書かれていない状態は文字のまま",
-    "state_icon_colors_helper": "1行に状態とそのトーンまたは色（warning: warning）"
+    "state_icon_colors_helper": "1行に状態とそのトーンまたは色（warning: warning）",
+    "horizontal": "横向き",
+    "exact_colors": "正確な色",
+    "exact_colors_helper": "色の名前は Home Assistant の色、カラーコードは入力どおり。変更しないときは Fluvy の設定のすべてのカードの値"
   },
   "strategy": {
     "home": "ホーム",
@@ -1284,7 +1287,15 @@
     "trigger.time_pattern": "タイムパターン",
     "trigger.time": "時刻",
     "trigger.homeassistant_stopping": "Home Assistantの停止",
-    "trigger.homeassistant_starting": "Home Assistantの起動"
+    "trigger.homeassistant_starting": "Home Assistantの起動",
+    "fact.who": "実行者",
+    "kind.account": "アカウント",
+    "kind.integration": "インテグレーション",
+    "you": "あなた",
+    "by": "実行者：{name}",
+    "by_you": "実行者：あなた",
+    "by_person": "人で絞り込む",
+    "everyone": "全員"
   },
   "alerts": {
     "preset.low_battery": "バッテリー低下",
@@ -2682,7 +2693,7 @@
     "pref.language": "言語",
     "pref.auto": "自動",
     "pref.reduce": "動きを減らす",
-    "pref.reduce_sub": "デバイスの設定に従います",
+    "pref.reduce_sub": "デバイスの設定にかかわらず",
     "pref.hold": "長押しでスライド",
     "pref.hold_sub": "タッチ画面では、スライダーは少し押さえてから動きます",
     "pref.haptics": "触覚フィードバック",
@@ -3008,7 +3019,12 @@
     "dashboard.up_to": "最大…",
     "dashboard.up_to_count": "各リスト最大{count}件",
     "cards.levels": "アイコンでレベルを表示",
-    "cards.levels_sub": "バッテリーの残量、信号の強さ、バルブの開閉"
+    "cards.levels_sub": "バッテリーの残量、信号の強さ、バルブの開閉",
+    "cards.sheets_history": "シートに過去24時間を表示",
+    "cards.exact": "正確な色",
+    "cards.exact_sub": "色の名前は Home Assistant の色で、カラーコードは入力どおりに表示し、パレットの色合いにはしません",
+    "scope.activity_who": "誰が操作したか",
+    "scope.activity_who_sub": "アクティビティの各項目に操作した人を写真付きで表示（人で絞り込むことも可能）"
   },
   "customise": {
     "title": "カスタマイズ",
@@ -3435,7 +3451,19 @@
     "editor.electric": "電気",
     "editor.hybrid": "プラグインハイブリッド",
     "editor.tank_size": "タンク容量",
-    "editor.tank_size_helper": "中身と同じ単位（L、gal）: 車が中身の量しか伝えないときの残量に使います"
+    "editor.tank_size_helper": "中身と同じ単位（L、gal）: 車が中身の量しか伝えないときの残量に使います",
+    "tyre_pressure_low": "タイヤ空気圧が低い",
+    "editor.tyre_decimals": "タイヤ空気圧の小数桁",
+    "editor.tyre_low": "タイヤ空気圧が低いとする値",
+    "editor.tyre_low_helper": "タイヤと同じ単位の空気圧、エンティティ、または {{ states('sensor.x') }} のようなテンプレート",
+    "engine": "エンジン",
+    "engine_running": "始動中",
+    "start_engine_confirm": "エンジンを始動しますか？",
+    "stop_engine_confirm": "エンジンを停止しますか？",
+    "editor.show_head": "ヘッダーを表示",
+    "editor.show_hero": "バッテリーを表示",
+    "editor.image_size": "画像のサイズ",
+    "editor.image_size_helper": "カードの幅に対する割合（例: 50%）、または高さ（例: 120px）"
   },
   "remote": {
     "key.power": "電源",
@@ -3603,8 +3631,8 @@
     "style": "面",
     "panel": "パネル",
     "card": "カード",
-    "width_tablet": "タブレットでの幅（px）",
-    "width_desktop": "デスクトップでの幅（px）",
+    "width_tablet": "タブレットでの幅",
+    "width_desktop": "デスクトップでの幅",
     "phone": "スマートフォン",
     "top": "ビューの上",
     "drawer": "ドロワー",
@@ -3621,7 +3649,9 @@
     "yaml": "このダッシュボードはYAMLで書かれています。これをファイルのviews:の横にコピーしてください",
     "copy": "YAMLをコピー",
     "copied": "YAMLをコピーしました",
-    "copy_failed": "コピーできませんでした：テキストを選択してコピーしてください"
+    "copy_failed": "コピーできませんでした：テキストを選択してコピーしてください",
+    "unit_screen": "画面の割合（%）",
+    "unit_dashboard": "ダッシュボードの割合（%）"
   },
   "compass": {
     "direction": "方位",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "矢印",
     "arrow_points": "矢印の向き",
     "arrow_outward": "外向き",
-    "arrow_inward": "内向き"
+    "arrow_inward": "内向き",
+    "pointer_chevron": "シェブロン",
+    "face": "文字盤"
   },
   "schedule": {
     "card": "暖房スケジュール",

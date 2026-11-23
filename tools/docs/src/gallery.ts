@@ -228,7 +228,7 @@ export const GALLERY: Readonly<Record<string, Example>> = {
         { name: 'Night', position: 0, tilt: 0 },
       ],
     },
-    variants: { compact: {} },
+    variants: { compact: {}, horizontal: {} },
   },
   'fluvy-fan-card': {
     config: { type: 'custom:fluvy-fan-card', entity: 'fan.ceiling', subtitle: 'Bedroom' },
@@ -437,6 +437,8 @@ export const GALLERY: Readonly<Record<string, Example>> = {
         { name: 'Bedroom', path: '/fluvy-home/bedroom' },
       ],
     },
+    layout: 'style',
+    variants: { plain: {} },
   },
   'fluvy-heading-card': {
     config: {

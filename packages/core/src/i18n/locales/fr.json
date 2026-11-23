@@ -685,7 +685,10 @@
     "state_display": "État affiché en",
     "state_icons": "Icônes par état",
     "state_icons_helper": "Un état et son icône par ligne (ok: mdi:check-circle-outline) ; un état non listé garde ses mots",
-    "state_icon_colors_helper": "Un état et sa tonalité ou sa couleur par ligne (warning: warning)"
+    "state_icon_colors_helper": "Un état et sa tonalité ou sa couleur par ligne (warning: warning)",
+    "horizontal": "Horizontale",
+    "exact_colors": "Couleurs exactes",
+    "exact_colors_helper": "Les noms tels que Home Assistant les dessine, un code hex tel que saisi. Inchangé, celui de toutes les cartes dans les réglages de Fluvy"
   },
   "strategy": {
     "home": "Accueil",
@@ -850,7 +853,15 @@
     "trigger.time_pattern": "motif horaire",
     "trigger.time": "heure",
     "trigger.homeassistant_stopping": "arrêt de Home Assistant",
-    "trigger.homeassistant_starting": "démarrage de Home Assistant"
+    "trigger.homeassistant_starting": "démarrage de Home Assistant",
+    "fact.who": "Qui",
+    "kind.account": "Compte",
+    "kind.integration": "Intégration",
+    "you": "Vous",
+    "by": "Par {name}",
+    "by_you": "Par vous",
+    "by_person": "Par personne",
+    "everyone": "Tout le monde"
   },
   "keypad": {
     "close": "Fermer",
@@ -1675,7 +1686,12 @@
     "dashboard.up_to": "Jusqu’à…",
     "dashboard.up_to_count": "Jusqu’à {count} par liste",
     "cards.levels": "Les icônes montrent leur niveau",
-    "cards.levels_sub": "La charge d’une batterie, les barres d’un signal, une vanne ouverte ou fermée"
+    "cards.levels_sub": "La charge d’une batterie, les barres d’un signal, une vanne ouverte ou fermée",
+    "cards.sheets_history": "Dernières 24 heures dans les détails",
+    "cards.exact": "Couleurs exactes",
+    "cards.exact_sub": "Les noms de couleur tels que Home Assistant les dessine et un code hex tel que saisi, pas les teintes de la palette",
+    "scope.activity_who": "Qui l’a fait",
+    "scope.activity_who_sub": "Chaque entrée de l’Activité nomme la personne derrière elle, avec sa photo ; un filtre par personne"
   },
   "customise": {
     "title": "Personnaliser",
@@ -3435,7 +3451,19 @@
     "editor.electric": "Électrique",
     "editor.hybrid": "Hybride rechargeable",
     "editor.tank_size": "Capacité du réservoir",
-    "editor.tank_size_helper": "Dans l’unité de son contenu (L, gal) : son niveau, quand la voiture ne dit que son contenu"
+    "editor.tank_size_helper": "Dans l’unité de son contenu (L, gal) : son niveau, quand la voiture ne dit que son contenu",
+    "tyre_pressure_low": "Pression des pneus basse",
+    "editor.tyre_decimals": "Décimales des pneus",
+    "editor.tyre_low": "Pneu sous-gonflé sous",
+    "editor.tyre_low_helper": "Une pression dans l’unité des pneus, une entité ou un modèle comme {{ states('sensor.x') }}",
+    "engine": "Moteur",
+    "engine_running": "En marche",
+    "start_engine_confirm": "Démarrer le moteur ?",
+    "stop_engine_confirm": "Arrêter le moteur ?",
+    "editor.show_head": "Afficher l’en-tête",
+    "editor.show_hero": "Afficher la batterie",
+    "editor.image_size": "Taille de l’image",
+    "editor.image_size_helper": "Une part de la largeur de la carte, comme 50%, ou une hauteur, comme 120px"
   },
   "remote": {
     "key.power": "Marche/arrêt",
@@ -3603,8 +3631,8 @@
     "style": "Surface",
     "panel": "Panneau",
     "card": "Carte",
-    "width_tablet": "Largeur sur une tablette (px)",
-    "width_desktop": "Largeur sur un ordinateur (px)",
+    "width_tablet": "Largeur sur une tablette",
+    "width_desktop": "Largeur sur un ordinateur",
     "phone": "Sur un téléphone",
     "top": "Au-dessus de la vue",
     "drawer": "Tiroir",
@@ -3621,7 +3649,9 @@
     "yaml": "Ce tableau de bord est écrit en YAML. Copiez ceci dans son fichier, à côté de views:",
     "copy": "Copier le YAML",
     "copied": "YAML copié",
-    "copy_failed": "Copie impossible : sélectionnez le texte et copiez-le"
+    "copy_failed": "Copie impossible : sélectionnez le texte et copiez-le",
+    "unit_screen": "% de l’écran",
+    "unit_dashboard": "% du tableau de bord"
   },
   "compass": {
     "direction": "Direction",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Flèche",
     "arrow_points": "La flèche pointe",
     "arrow_outward": "Vers l’extérieur",
-    "arrow_inward": "Vers l’intérieur"
+    "arrow_inward": "Vers l’intérieur",
+    "pointer_chevron": "Chevron",
+    "face": "Cadran"
   },
   "schedule": {
     "card": "Programme de chauffage",

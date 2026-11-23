@@ -685,7 +685,10 @@
     "state_display": "Estado mostrado como",
     "state_icons": "Ícones por estado",
     "state_icons_helper": "Um estado e seu ícone em cada linha (ok: mdi:check-circle-outline); um estado não listado mantém suas palavras",
-    "state_icon_colors_helper": "Um estado e seu tom ou cor em cada linha (warning: warning)"
+    "state_icon_colors_helper": "Um estado e seu tom ou cor em cada linha (warning: warning)",
+    "horizontal": "Horizontal",
+    "exact_colors": "Cores exatas",
+    "exact_colors_helper": "Os nomes como o Home Assistant os desenha, um código hex como digitado. Sem mexer, a de todos os cartões nas configurações do Fluvy"
   },
   "strategy": {
     "home": "Início",
@@ -850,7 +853,15 @@
     "trigger.time_pattern": "padrão de horário",
     "trigger.time": "horário",
     "trigger.homeassistant_stopping": "Home Assistant parando",
-    "trigger.homeassistant_starting": "Home Assistant iniciando"
+    "trigger.homeassistant_starting": "Home Assistant iniciando",
+    "fact.who": "Quem",
+    "kind.account": "Conta",
+    "kind.integration": "Integração",
+    "you": "Você",
+    "by": "Por {name}",
+    "by_you": "Por você",
+    "by_person": "Por pessoa",
+    "everyone": "Todos"
   },
   "keypad": {
     "close": "Fechar",
@@ -1675,7 +1686,12 @@
     "dashboard.up_to": "Até…",
     "dashboard.up_to_count": "Até {count} por lista",
     "cards.levels": "Os ícones mostram o nível",
-    "cards.levels_sub": "A carga de uma bateria, as barras de um sinal, uma válvula aberta ou fechada"
+    "cards.levels_sub": "A carga de uma bateria, as barras de um sinal, uma válvula aberta ou fechada",
+    "cards.sheets_history": "Últimas 24 horas nos detalhes",
+    "cards.exact": "Cores exatas",
+    "cards.exact_sub": "Os nomes de cor como o Home Assistant os desenha e um código hex como digitado, não os tons da paleta",
+    "scope.activity_who": "Quem fez",
+    "scope.activity_who_sub": "Cada registro da Atividade mostra a pessoa por trás dele, com a foto dela; um filtro por pessoa"
   },
   "customise": {
     "title": "Personalizar",
@@ -3435,7 +3451,19 @@
     "editor.electric": "Elétrico",
     "editor.hybrid": "Híbrido plug-in",
     "editor.tank_size": "Capacidade do tanque",
-    "editor.tank_size_helper": "Na unidade do conteúdo (L, gal): o nível, quando o carro informa só o conteúdo"
+    "editor.tank_size_helper": "Na unidade do conteúdo (L, gal): o nível, quando o carro informa só o conteúdo",
+    "tyre_pressure_low": "Pressão dos pneus baixa",
+    "editor.tyre_decimals": "Casas decimais dos pneus",
+    "editor.tyre_low": "Pneu baixo abaixo de",
+    "editor.tyre_low_helper": "Uma pressão na unidade dos pneus, uma entidade ou um modelo como {{ states('sensor.x') }}",
+    "engine": "Motor",
+    "engine_running": "Ligado",
+    "start_engine_confirm": "Ligar o motor?",
+    "stop_engine_confirm": "Desligar o motor?",
+    "editor.show_head": "Mostrar o cabeçalho",
+    "editor.show_hero": "Mostrar a bateria",
+    "editor.image_size": "Tamanho da imagem",
+    "editor.image_size_helper": "Uma parte da largura do cartão, como 50%, ou uma altura, como 120px"
   },
   "remote": {
     "key.power": "Liga/desliga",
@@ -3603,8 +3631,8 @@
     "style": "Superfície",
     "panel": "Faixa",
     "card": "Cartão",
-    "width_tablet": "Largura em um tablet (px)",
-    "width_desktop": "Largura em um computador (px)",
+    "width_tablet": "Largura em um tablet",
+    "width_desktop": "Largura em um computador",
     "phone": "Em um celular",
     "top": "Acima da visualização",
     "drawer": "Gaveta",
@@ -3621,7 +3649,9 @@
     "yaml": "Este painel está escrito em YAML. Copie isto para o arquivo dele, ao lado de views:",
     "copy": "Copiar o YAML",
     "copied": "YAML copiado",
-    "copy_failed": "Não foi possível copiar: selecione o texto e copie"
+    "copy_failed": "Não foi possível copiar: selecione o texto e copie",
+    "unit_screen": "% da tela",
+    "unit_dashboard": "% do painel"
   },
   "compass": {
     "direction": "Direção",
@@ -3639,7 +3669,9 @@
     "pointer_arrow": "Seta",
     "arrow_points": "A seta aponta",
     "arrow_outward": "Para fora",
-    "arrow_inward": "Para dentro"
+    "arrow_inward": "Para dentro",
+    "pointer_chevron": "Divisa",
+    "face": "Mostrador"
   },
   "schedule": {
     "card": "Agenda de aquecimento",

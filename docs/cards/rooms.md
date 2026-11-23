@@ -63,6 +63,7 @@ rooms:
 # card_color:
 # card_opacity: 100
 # card_border: true
+# exact_colors: false
 # unavailable: dashed
 # light_colors: false
 # tap_action:
@@ -109,6 +110,7 @@ rooms:
 | `card_opacity` | `100` | How solid the card’s surface is, in percent: under 100 the view’s background shows through. Left out, the house’s. 0 % to 100 %, in steps of 5. |
 | `card_border` | `true` | Whether the card draws its hairline border. Left out, the house’s. |
 | `card_blur` | `true` | Whether what shows through a see-through card is blurred. Left out, the house’s, and none at 0 %. |
+| `exact_colors` | `false` | Wears the colours the card names as Home Assistant draws them and a hex as typed, not the palette’s tones. Left out, the house’s. |
 | `unavailable` | `dashed` | How the card looks while its entity is unavailable: dashed, or quiet as when it is off. Left out, the house’s. `dashed` · `quiet` (As when off). |
 | **Interactions** |  |  |
 | `tap_action` | the card’s own | What a tap on the card does. |
@@ -162,6 +164,11 @@ rooms: # left out: every area, in the house's order
       - climate
       - entity: media_player.kids_speaker
         icon: mdi:music
+      - entity: vacuum.kids_room # its own tap and hold
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
 ```
 
 - An area's icon from Home Assistant (`mdi:sofa`, `mdi:bed`, `mdi:stove`) is drawn as Fluvy's room; `icon` sets
@@ -171,6 +178,10 @@ rooms: # left out: every area, in the house's order
 - `variant`: `rows`, `compact` (48 px rows, the temperature at their end) or `tiles` (two a row from a phone's width).
 - The rooms' quick actions stand in columns, the lights under the lights: a room without blinds or a thermostat
   leaves that place empty. Where a quick action says its state (`show_state`), they stand packed.
+- A quick action's tap switches a room's set, or an entity that is safe to switch (a light, a switch, a blind, a fan;
+  a lock asks first), and opens the details of anything else; its hold opens its details. Each may have its own
+  `tap_action`, `hold_action` and `double_tap_action`, a set by its word too (`group: covers`), in YAML or in the
+  room's form in the editor.
 - What does not fit a row gives way in order: the arrows, then the rounds from the end, then the circles.
 - To fold the card away under a head, put it in an [Expander](expander.md): it remembers whether it was open.
 

@@ -1,18 +1,19 @@
 import {
   deviceNameOf,
   formatNumber,
+  isEntityId,
+  isUsable,
   relativeTime,
   stateText,
   strings,
   textName,
+  TOGGLE_DOMAINS,
   type ActionConfig,
   type EntityName,
   type EntityView,
   type FluvyCardConfig,
-  type HaFormSchemaItem,
   type HomeAssistant,
   type MessageKey,
-  type LovelaceConfigForm,
   type LovelaceGridOptions,
 } from '@fluvy/core';
 import {
@@ -25,6 +26,7 @@ import {
   listRow,
   pressCover,
   preventMenu,
+  sheetStyles,
   startPress,
   type PressTarget,
   type Tone,
@@ -33,60 +35,39 @@ import { energyStyles } from '@fluvy/ui/styles/energy';
 import { css, html, nothing, svg, type CSSResultGroup, type TemplateResult } from 'lit';
 
 import { HeadFit, ROW_NAME_MIN } from '../energy/head.js';
+import { statesUnder, type QuickStatePosition } from '../room/room-card.js';
 import { MARK_LABEL, markedRuler } from '../energy/marked-ruler.js';
-import {
-  ACTIONS_BASE,
-  Card,
-  ICON_ACTIONS_BASE,
-  MORE_INFO,
-  type BaseKey,
-  type HeadConfig,
-} from '../shared/base.js';
+import { Card, MORE_INFO, type CardEditor, type HeadConfig, type Press } from '../shared/base.js';
 import { toneOf } from '../shared/colour.js';
-import { configKeys } from '../shared/config.js';
+import type { AliasSpec } from '../shared/config.js';
 import { spanText, unitWord, withUnit } from '../shared/duration.js';
 import { fitLine, type Segment } from '../shared/fit.js';
-import {
-  accentField,
-  actionField,
-  actionFields,
-  doubleTapField,
-  optionalActions,
-  boolField,
-  choiceField,
-  colourFields,
-  editorLabels,
-  editorWord,
-  entityField,
-  fieldRow,
-  iconField,
-  nameIconFields,
-  numberField,
-  onlyWhen,
-  selectField,
-  headFields,
-  textField,
-  unitChoices,
-} from '../shared/form.js';
 import { durationSeconds, when } from '../shared/job-time.js';
 import { BrokenPictures, imageEntity, imageOf } from '../shared/picture.js';
-import type { EditorDefaults, RowsListSpec } from '../shared/rows-editor.js';
 import { Ticker, MINUTE } from '../shared/ticker.js';
+import {
+  roundOf,
+  roundsIn,
+  roundsOf,
+  roundTap,
+  type RoundSpec,
+  type RoundsHost,
+} from '../shared/rounds.js';
+import { PENDING_LINE } from '../shared/templates.js';
 import { valueRow } from '../shared/value-row.js';
 import {
-  VEHICLE_VARIANTS,
   pictureAt,
+  picturePlate,
   vehicleHeight,
   vehicleVariant,
   type VehicleVariant,
 } from '../vehicle-family.js';
 import { VEHICLE_GLYPHS } from './glyphs.js';
 import {
-  VEHICLE_PLATFORMS,
-  VEHICLE_ROLES,
   vehicleDevice,
   vehicleDevices,
   vehicleEntities,
+  rolesOfMap,
   type NamedRole,
   type VehicleEntities,
   type VehicleRole,
@@ -97,6 +78,7 @@ import {
   cabinOf,
   chargeOf,
   convertDistance,
+  convertPressure,
   energyOf,
   isDistance,
   lineOf,
@@ -125,6 +107,7 @@ const s = strings('vehicle');
 /** The round controls, each where the car has what it takes. */
 export type VehicleControl =
   | 'lock'
+  | 'engine'
   | 'climate'
   | 'charging'
   | 'charge_port'
@@ -135,6 +118,7 @@ export type VehicleControl =
   | 'sentry';
 export const VEHICLE_CONTROLS: readonly VehicleControl[] = [
   'lock',
+  'engine',
   'climate',
   'charging',
   'charge_port',
@@ -144,9 +128,13 @@ export const VEHICLE_CONTROLS: readonly VehicleControl[] = [
   'doors',
   'sentry',
 ];
-/** The controls a card shows where it names none: the ones the car has, in this order (its doors and port on request). */
+/**
+ * The controls a card shows where it names none: the ones the car has, in this order (its doors and port on request;
+ * its engine where a person names what starts it).
+ */
 const DEFAULT_CONTROLS: readonly VehicleControl[] = [
   'lock',
+  'engine',
   'climate',
   'charging',
   'trunk',
@@ -193,13 +181,22 @@ export const VEHICLE_ROWS: readonly VehicleRow[] = [
 ];
 const DEFAULT_ROWS: readonly VehicleRow[] = ['location', 'odometer'];
 
-/** A control as a list names it: which, and what the card may change of it. */
+/** A control as a list names it: one of the car's, or an entity of the person's own, and what the card may change of it. */
 export interface ControlEntry {
-  readonly control: VehicleControl;
+  /** One of the car's: what it reads and how it acts, the card knows. */
+  readonly control?: VehicleControl;
+  /**
+   * An entity of the person's own where it names no control (#248: a switch, a button, a script, a scene): its round
+   * lit while it is on, a tap on and off where its kind takes one, else its details; its name under it.
+   */
+  readonly entity?: string;
   readonly name?: string;
   readonly icon?: string;
   readonly color?: string;
-  /** Whether a tap that acts on the car asks first (by default: unlocking, opening, venting, stopping a charge). */
+  /**
+   * Whether a tap that acts asks first: by default the car's own unlocking, opening, venting and stopping a charge do;
+   * an entity's own tap asks where this says so.
+   */
   readonly confirm?: boolean;
   readonly tap_action?: ActionConfig;
   readonly hold_action?: ActionConfig;
@@ -224,7 +221,10 @@ export interface VehicleCardConfig extends FluvyCardConfig, HeadConfig {
   variant?: VehicleVariant;
   /** Whether its entities are found on its device (the default); off, only `roles` play. */
   scan?: boolean;
-  /** Entities named by hand for a part the card does not find, or plays otherwise: `{ role, entity }`. */
+  /**
+   * Entities named by hand for a part the card does not find, or plays otherwise: `{ role, entity }` (a map of each role
+   * to its entity reads as that list).
+   */
   roles?: readonly NamedRole[];
   /**
    * What it runs on: its battery, its tank, or both (a plug-in hybrid); `auto` (the default), its tank where it has
@@ -235,9 +235,23 @@ export interface VehicleCardConfig extends FluvyCardConfig, HeadConfig {
   tank_size?: number;
   /** The battery (or the tank) on its ruler (the default) or as a ring; a hybrid's two are rulers. */
   hero?: 'ruler' | 'ring';
+  /**
+   * The head's badge of the person's own (#251): words, an entity's state or a template, in place of what the car does
+   * (which says it again where the answer is empty); "Unavailable" while the car is out of reach.
+   */
+  badge?: string;
   /** A picture of the car: an address, an entity whose picture it is, or `auto` (the integration's own). */
   image?: string;
   image_position?: 'hero' | 'head';
+  /**
+   * The picture's size over the battery (#254): a share of the card's width (`50%`) or a height (`120px`, or a
+   * figure), the card's height following it; none, 2:1 across the column.
+   */
+  image_size?: string | number;
+  /** Whether the head shows (its circle or picture, its name, where it is and what it does): unless `false` (#254). */
+  show_head?: boolean;
+  /** Whether the battery (or the tank, or a hybrid's both) shows: unless `false` (#254). */
+  show_hero?: boolean;
   show_range?: boolean;
   show_limit?: boolean;
   /** The line under the battery: when it is full, why it is not charging, a low range, a cold cabin. */
@@ -247,6 +261,22 @@ export interface VehicleCardConfig extends FluvyCardConfig, HeadConfig {
   show_rows?: boolean;
   rows?: ReadonlyArray<VehicleRow | RowEntry>;
   show_tyres?: boolean;
+  /**
+   * Small rounds at the card's foot (#251), each an entity's (a sensor, a door left ajar, a script) with its own name,
+   * icon, colour, actions and state: as many as one line holds, those that do not giving way from the end.
+   */
+  quick_actions?: ReadonlyArray<string | RoundSpec>;
+  /** Every quick action's state in the pill its round grows into; a quick action may say its own (`show_state`). */
+  show_quick_states?: boolean;
+  /** Where their states stand: `under` their glyphs (the default: the line 20 taller), or `beside` them. */
+  quick_state_position?: QuickStatePosition;
+  /** The tyres' decimals (0–2), or `auto`: their sensors' precision, else one under 10; the editor writes them as words. */
+  tyre_decimals?: number | string;
+  /**
+   * Under this pressure a tyre is low (#251): a figure in the tyres' unit, an entity (its reading, in its own unit), or
+   * a template; its figure in the warning's ink, its wheel in the drawing, and "Low tyre pressure" on the line.
+   */
+  tyre_low?: number | string;
   /** Under this range (in the range's unit) it is low; without it, a charge of 20 % or less is. */
   low_range?: number;
   /** Minutes after which a car that has said nothing says when it last did ("Updated 2 h ago"). */
@@ -268,7 +298,6 @@ export interface VehicleCardConfig extends FluvyCardConfig, HeadConfig {
 
 /** A control's cell: its round, its word under it, what a tap does. */
 interface ControlView {
-  readonly key: VehicleControl;
   readonly name: string;
   readonly glyph: string;
   readonly word: string;
@@ -285,6 +314,21 @@ interface ControlView {
   readonly why: string;
   readonly accent: string | undefined;
   readonly entry: ControlEntry;
+  /** An entity of the person's own: its round's tap and hold (`roundOf`), and its state for a reader. */
+  readonly own?: {
+    readonly onTap: (() => void) | undefined;
+    readonly onHold: (() => void) | undefined;
+    readonly state: string;
+  };
+}
+
+/** A tyre as the card draws it: its wheel, its pressure and unit (or its warning's word), whether it is low, what it opens. */
+interface Tyre {
+  readonly wheel: Wheel;
+  readonly value: string;
+  readonly unit: string;
+  readonly low: boolean;
+  readonly id: string | undefined;
 }
 
 /** A distance as the card writes it, in its unit, and its number (null where it cannot be read). */
@@ -343,6 +387,8 @@ interface Reading {
   readonly low: boolean;
   /** What stands open (a window first, then a door, the boot, the front boot), null where all is shut. */
   readonly open: Opening | null;
+  /** Its four tyres, front left to rear right: what the tyres' panel draws, and a low one the line says. */
+  readonly tyres: readonly Tyre[];
   readonly cabin: Cabin;
   /** "Updated 2 h ago" while the car says nothing, '' otherwise. */
   readonly stale: string;
@@ -353,7 +399,8 @@ interface Reading {
   /** The car out of reach: every part at rest in the off skin, at its size (1.9). */
   readonly unavailable: boolean;
   readonly tone: Tone;
-  readonly badge: { readonly text: string; readonly tone: Tone };
+  /** What the head's badge says: what the car does, or the person's own (`own`); none while their template is asked. */
+  readonly badge: { readonly text: string; readonly tone: Tone; readonly own?: boolean } | null;
 }
 
 /** The line under the battery: its parts, and the ink it is said in. */
@@ -376,8 +423,10 @@ const CELL_MIN = 56;
 const WORD_CLEAR = 2;
 /** The tyres' car from above: its box in the panel. */
 const CAR_WIDTH = 40;
+/** The wheels, in the order the tyres' panel reads them: the front's left and right, then the rear's. */
+const WHEELS: readonly Wheel[] = ['fl', 'fr', 'rl', 'rr'];
 /** Minutes without a word from the car after which the card says when it last spoke (`stale_after`). */
-const STALE_AFTER = 30;
+export const STALE_AFTER = 30;
 /** A lock's states, each a word its round may say. */
 const LOCK_STATES: readonly string[] = [
   'locked',
@@ -389,38 +438,24 @@ const LOCK_STATES: readonly string[] = [
   'opening',
 ];
 
-/** A unit a figure reads in: automatic (the sensor's own), or one of `units`. */
-const unitField = (name: string, units: readonly string[]): HaFormSchemaItem => ({
-  name,
-  selector: { select: { mode: 'dropdown', options: unitChoices(units) } },
-});
-
 /** The words of a control's state, for the reader: "Lock · Locked". */
 const said = (view: Pick<ControlView, 'name' | 'word'>): string =>
   view.word && view.word !== view.name ? `${view.name} · ${view.word}` : view.name;
 
-/** A list's entry as an object: a bare key is `{ control }` / `{ row }`. */
-const controlEntry = (raw: VehicleControl | ControlEntry): ControlEntry =>
-  typeof raw === 'string' ? { control: raw } : raw;
+/**
+ * A list's entry as an object: a bare key is `{ control }` (an entity's id `{ entity }`) / `{ row }`; `control: entity`,
+ * the editor's word for one of the person's own, is its `entity` alone.
+ */
+const controlEntry = (raw: VehicleControl | ControlEntry): ControlEntry => {
+  if (typeof raw === 'string') return isEntityId(raw) ? { entity: raw } : { control: raw };
+  const { control, ...own } = raw;
+  return (control as string) === 'entity' ? own : raw;
+};
 const rowEntry = (raw: VehicleRow | RowEntry): RowEntry =>
   typeof raw === 'string' ? { row: raw } : raw;
 
-/** The editor's choices of a list's key, each by its word. */
-const keyPicker = <K extends string>(
-  name: string,
-  keys: readonly K[],
-  word: (key: K) => MessageKey,
-): HaFormSchemaItem => ({
-  name,
-  selector: {
-    select: {
-      mode: 'dropdown',
-      options: keys.map((value) => ({ value, label: editorWord(word(value)) })),
-    },
-  },
-});
 /** A control's word: its name ("Charging" for the charge's; the front boot is a bonnet where an engine is under it). */
-const controlWord = (key: VehicleControl, energy: Energy = 'electric'): MessageKey =>
+export const controlWord = (key: VehicleControl, energy: Energy = 'electric'): MessageKey =>
   key === 'lock'
     ? 'lock.lock'
     : key === 'charging'
@@ -428,60 +463,6 @@ const controlWord = (key: VehicleControl, energy: Energy = 'electric'): MessageK
       : key === 'frunk' && energy !== 'electric'
         ? 'vehicle.bonnet'
         : `vehicle.${key}`;
-const controlPicker = (): HaFormSchemaItem => keyPicker('control', VEHICLE_CONTROLS, controlWord);
-const rowPicker = (): HaFormSchemaItem =>
-  keyPicker('row', VEHICLE_ROWS, (key): MessageKey => `vehicle.${key}`);
-/** A role's word in the editor: its control's or its row's where it has one, else its own. */
-const ROLE_WORDS: Readonly<Record<VehicleRole, MessageKey>> = {
-  battery: 'vehicle.battery',
-  range: 'vehicle.range',
-  charging: 'vehicle.role.charging',
-  plugged: 'vehicle.role.plugged',
-  charge_power: 'vehicle.charge_power',
-  charge_rate: 'vehicle.charge_rate',
-  time_to_full: 'vehicle.time_to_full',
-  charge_limit: 'vehicle.charge_limit',
-  charge_switch: 'vehicle.role.charge_switch',
-  charge_start: 'vehicle.role.charge_start',
-  charge_stop: 'vehicle.role.charge_stop',
-  charge_port: 'vehicle.charge_port',
-  climate: 'vehicle.climate',
-  climate_switch: 'vehicle.role.climate_switch',
-  climate_start: 'vehicle.role.climate_start',
-  climate_stop: 'vehicle.role.climate_stop',
-  climate_running: 'vehicle.role.climate_running',
-  inside: 'vehicle.inside',
-  outside: 'vehicle.outside',
-  lock: 'lock.lock',
-  trunk: 'vehicle.trunk',
-  frunk: 'vehicle.frunk',
-  windows: 'vehicle.windows',
-  sentry: 'vehicle.sentry',
-  odometer: 'vehicle.odometer',
-  location: 'vehicle.location',
-  address: 'vehicle.role.address',
-  software: 'vehicle.software',
-  state: 'vehicle.role.state',
-  shift: 'vehicle.role.shift',
-  speed: 'vehicle.speed',
-  moving: 'vehicle.role.moving',
-  updated: 'vehicle.role.updated',
-  fuel: 'vehicle.fuel',
-  fuel_range: 'vehicle.fuel_range',
-  fuel_volume: 'vehicle.fuel_volume',
-  fuel_low: 'vehicle.role.fuel_low',
-  adblue: 'vehicle.adblue',
-  oil: 'vehicle.oil',
-  service: 'vehicle.service',
-  service_time: 'vehicle.role.service_time',
-  tyre_fl: 'vehicle.tyre_fl',
-  tyre_fr: 'vehicle.tyre_fr',
-  tyre_rl: 'vehicle.tyre_rl',
-  tyre_rr: 'vehicle.tyre_rr',
-};
-const rolePicker = (): HaFormSchemaItem =>
-  keyPicker('role', VEHICLE_ROLES, (role) => ROLE_WORDS[role]);
-
 /** The car from above (the tyres' panel): its body, its glass, its four wheels — a wheel with a warning in its ink. */
 function carFromAbove(low: Readonly<Partial<Record<Wheel, boolean>>>): TemplateResult {
   const wheel = (x: number, y: number, key: Wheel) =>
@@ -515,26 +496,48 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
     return vehicleHeight(config);
   }
 
+  /** `roles` written as a map (`{ fuel: sensor.x }`) reads as the list it means, in the card and in its editor. */
+  static override aliases: AliasSpec = {
+    upgrade: (config) => {
+      const roles = config['roles'];
+      return roles && typeof roles === 'object' && !Array.isArray(roles)
+        ? { ...config, roles: rolesOfMap(roles as Readonly<Record<string, unknown>>) }
+        : config;
+    },
+  };
+
   static override styles: CSSResultGroup = [
     ...(Card.styles as CSSResultGroup[]),
     energyStyles,
+    sheetStyles.rooms,
     css`
       .vh-card {
         position: relative;
         width: 100%;
       }
-      /* the car's picture over its battery: 2:1 across the column, the whole car on the card (a picture with no ground
-         of its own floats on it); none found, the plate keeps its place with the car's glyph */
+      /* the car's picture over its battery: its plate 2:1 across the column, or at its own size (#254), the whole car on
+         the card (a picture with no ground of its own floats on it); none found, the plate keeps its place with the
+         car's glyph */
       .vh-picture {
         position: relative;
         display: grid;
         place-items: center;
-        margin-top: 16px;
-        aspect-ratio: 2 / 1;
+        margin: 16px auto 0;
         border-radius: var(--fluvy-radius-lg);
-        cursor: pointer;
       }
+      /* the card's button where its head is hidden (#254) */
+      .vh-picture > .fv-tile__tap {
+        border-radius: inherit;
+      }
+      /* the first part where the head is hidden sits at the card's padding (#254) */
+      .vh-card > :first-child,
+      .vh-card > .vh-hero:first-child > :first-child {
+        margin-top: 0;
+      }
+      /* the whole car inside its plate, whatever size the plate is given (#254) */
       .vh-picture > img {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: contain;
@@ -589,7 +592,7 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
       /* the line under the battery: one line, its parts fitted to it */
       .vh-line {
         height: 20px;
-        margin-top: 8px;
+        margin-top: 16px;
         overflow: hidden;
         font-size: 13px;
         font-weight: 500;
@@ -597,6 +600,9 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
         color: var(--fluvy-text-secondary);
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
+      }
+      .vh-hero + .vh-line {
+        margin-top: 8px;
       }
       .vh-line.is-warning {
         color: var(--fluvy-warning);
@@ -730,6 +736,11 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
       .vh-control__word.is-warning {
         color: var(--fluvy-warning);
       }
+      /* an entity of the person's own says its name, cut to an ellipsis where the cell is narrower */
+      .vh-control__word.is-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .vh-control__word.is-cool {
         color: var(--fluvy-state-climate-cool);
       }
@@ -748,6 +759,15 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
       }
       .vh-rows {
         margin-top: 16px;
+      }
+      /* the quick actions: one line of rounds at the foot, from its start; 64 tall where their states stand under them */
+      .vh-quick {
+        display: flex;
+        height: 44px;
+        margin-top: 16px;
+      }
+      .vh-quick.is-under {
+        height: 64px;
       }
       /* a column too narrow for a row's name and its value side by side: the value under the name, in the row's 48 */
       .vh-rows .fv-row--stack {
@@ -818,6 +838,15 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
       }
       .vh-tyres.is-bare .vh-tyre.is-left {
         text-align: left;
+      }
+      /* a column too narrow for a pressure and its unit side by side: the unit under its figure, in the row's 36 */
+      .vh-tyres.is-stacked .vh-tyre {
+        display: flex;
+        flex-direction: column;
+      }
+      .vh-tyres.is-stacked .vh-tyre .fv-unit {
+        margin-left: 0;
+        line-height: 16px;
       }
       .vh-tyre.is-low,
       .vh-tyre.is-low .fv-unit {
@@ -898,240 +927,8 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
   /** A picture that would not load: the plate keeps its place with the car's glyph (until the address changes). */
   private readonly pictures = new BrokenPictures(this);
 
-  /** A car has no entity of its own to show: its device does; `entity` names one of its entities instead. */
-  static override base: readonly BaseKey[] = [
-    'entity',
-    'name',
-    'icon',
-    'tone',
-    'color',
-    'card_color',
-    'card_opacity',
-    'card_border',
-    'card_blur',
-    'unavailable',
-    ...ACTIONS_BASE,
-    'show_icon',
-    'name_lines',
-    'show_badge',
-    ...ICON_ACTIONS_BASE,
-  ];
-  static override keys = configKeys<VehicleCardConfig>()([
-    'device',
-    'variant',
-    'scan',
-    'roles',
-    'energy',
-    'tank_size',
-    'hero',
-    'image',
-    'image_position',
-    'show_range',
-    'show_limit',
-    'show_status',
-    'show_controls',
-    'controls',
-    'show_rows',
-    'rows',
-    'show_tyres',
-    'low_range',
-    'stale_after',
-    'range_unit',
-    'range_decimals',
-    'power_unit',
-    'power_decimals',
-    'hero_tap_action',
-    'hero_hold_action',
-    'hero_double_tap_action',
-  ]);
-  static override lists: readonly RowsListSpec[] = [
-    {
-      key: 'controls',
-      idKey: 'control',
-      title: 'editor.controls',
-      keys: [
-        'control',
-        'name',
-        'icon',
-        'color',
-        'confirm',
-        'tap_action',
-        'hold_action',
-        'double_tap_action',
-      ],
-      computeLabel: (schema) =>
-        schema.name === 'control'
-          ? editorWord('vehicle.editor.control')
-          : schema.name === 'confirm'
-            ? editorWord('vehicle.editor.confirm')
-            : undefined,
-      picker: controlPicker(),
-      when: (data) => data['show_controls'] !== false && data['variant'] !== 'mini',
-      schema: [
-        controlPicker(),
-        fieldRow(textField('name'), iconField()),
-        fieldRow(accentField('color', { item: 'card' }), boolField('confirm')),
-        // a control does what it does on the car where it names no tap of its own
-        actionFields({ tap: null }),
-      ],
-    },
-    {
-      key: 'rows',
-      idKey: 'row',
-      also: ['entity'],
-      title: 'editor.rows',
-      keys: [
-        'row',
-        'entity',
-        'name',
-        'icon',
-        'color',
-        'tap_action',
-        'hold_action',
-        'double_tap_action',
-      ],
-      computeLabel: (schema) => (schema.name === 'row' ? editorWord('editor.row') : undefined),
-      picker: rowPicker(),
-      when: (data) => data['show_rows'] !== false && (data['variant'] ?? 'full') === 'full',
-      schema: [
-        rowPicker(),
-        entityField(undefined, 'entity', false),
-        nameIconFields(),
-        accentField('color', { item: 'card' }),
-        actionFields({ hold: 'none' }),
-      ],
-    },
-    {
-      key: 'roles',
-      idKey: 'role',
-      title: 'vehicle.editor.roles',
-      keys: ['role', 'entity'],
-      computeLabel: (schema) =>
-        schema.name === 'role' ? editorWord('vehicle.editor.role') : undefined,
-      picker: rolePicker(),
-      schema: [rolePicker(), entityField(undefined, 'entity')],
-    },
-  ];
-  /** What the editor shows where the config says nothing: what the card does then. */
-  static override defaults: EditorDefaults = () => ({
-    variant: 'full',
-    scan: true,
-    energy: 'auto',
-    hero: 'ruler',
-    image_position: 'hero',
-    show_range: true,
-    show_limit: true,
-    show_status: true,
-    show_controls: true,
-    show_rows: true,
-    show_tyres: false,
-    stale_after: STALE_AFTER,
-    range_unit: 'auto',
-    range_decimals: 'auto',
-    power_unit: 'auto',
-    power_decimals: 'auto',
-  });
-  static override getConfigForm(): LovelaceConfigForm {
-    const full = (data: Readonly<Record<string, unknown>>): boolean =>
-      (data['variant'] ?? 'full') === 'full';
-    const notMini = (data: Readonly<Record<string, unknown>>): boolean =>
-      data['variant'] !== 'mini';
-    const hasImage = (data: Readonly<Record<string, unknown>>): boolean =>
-      typeof data['image'] === 'string' && data['image'].trim() !== '';
-    // a tank's size where one may be drawn; a charge limit where a battery may be; a ring where one gauge is
-    const tanked = (data: Readonly<Record<string, unknown>>): boolean =>
-      data['energy'] !== 'electric';
-    const charged = (data: Readonly<Record<string, unknown>>): boolean => data['energy'] !== 'fuel';
-    const decimals = ['auto', '0', '1', '2'] as const;
-    return {
-      schema: [
-        {
-          name: 'device',
-          selector: {
-            device: { filter: VEHICLE_PLATFORMS.map((integration) => ({ integration })) },
-          },
-        },
-        entityField(undefined, 'entity', false),
-        boolField('scan'),
-        nameIconFields(),
-        headFields({ badge: true }),
-        selectField('variant', VEHICLE_VARIANTS),
-        fieldRow(
-          choiceField('energy', [
-            ['auto', 'option.auto'],
-            ['electric', 'vehicle.editor.electric'],
-            ['fuel', 'vehicle.fuel'],
-            ['hybrid', 'vehicle.editor.hybrid'],
-          ]),
-          onlyWhen(tanked, numberField('tank_size', 0, 500)),
-        ),
-        onlyWhen(
-          (data) => full(data) && data['energy'] !== 'hybrid',
-          selectField('hero', ['ruler', 'ring']),
-        ),
-        onlyWhen(notMini, textField('image')),
-        onlyWhen(
-          (data) => full(data) && hasImage(data),
-          choiceField('image_position', [
-            ['hero', 'vehicle.editor.image_hero'],
-            ['head', 'vehicle.editor.image_head'],
-          ]),
-        ),
-        onlyWhen(
-          notMini,
-          fieldRow(boolField('show_range'), onlyWhen(charged, boolField('show_limit'))),
-        ),
-        onlyWhen(notMini, fieldRow(boolField('show_status'), boolField('show_controls'))),
-        onlyWhen(full, fieldRow(boolField('show_rows'), boolField('show_tyres'))),
-        fieldRow(numberField('low_range', 0, 1000), numberField('stale_after', 0, 1440)),
-        fieldRow(unitField('range_unit', ['km', 'mi']), selectField('range_decimals', decimals)),
-        fieldRow(unitField('power_unit', ['W', 'kW']), selectField('power_decimals', decimals)),
-        ...colourFields(),
-        actionFields({ icon: true }),
-        onlyWhen(
-          notMini,
-          fieldRow(actionField('hero_tap_action'), actionField('hero_hold_action')),
-        ),
-        onlyWhen(notMini, optionalActions(doubleTapField('hero_double_tap_action'))),
-      ],
-      ...editorLabels(
-        s,
-        {
-          device: 'editor.device',
-          scan: 'editor.scan',
-          energy: 'editor.energy',
-          tank_size: 'editor.tank_size',
-          hero: 'editor.hero',
-          image_position: 'editor.image_position',
-          show_range: 'editor.show_range',
-          show_limit: 'editor.show_limit',
-          show_status: 'editor.show_status',
-          show_tyres: 'editor.show_tyres',
-          low_range: 'editor.low_range',
-          stale_after: 'editor.stale_after',
-          range_unit: 'editor.range_unit',
-          range_decimals: 'editor.range_decimals',
-          power_unit: 'editor.power_unit',
-          power_decimals: 'editor.power_decimals',
-          hero_tap_action: 'editor.hero_tap_action',
-          hero_hold_action: 'editor.hero_hold_action',
-          hero_double_tap_action: 'editor.hero_double_tap_action',
-        },
-        {
-          image: 'editor.picture',
-          show_controls: 'editor.show_actions',
-          show_rows: 'editor.show_rows',
-        },
-      ),
-      computeHelper: (schema) =>
-        schema.name === 'scan'
-          ? s(undefined, 'editor.scan_helper')
-          : schema.name === 'image'
-            ? s(undefined, 'editor.image_helper')
-            : schema.name === 'tank_size'
-              ? s(undefined, 'editor.tank_size_helper')
-              : undefined,
-    };
+  static override editor(): Promise<CardEditor> {
+    return import('./vehicle-editor.js');
   }
 
   /** A new card takes the house's first car. */
@@ -1182,6 +979,8 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
       ...windows,
       ...Object.values(warnings),
       ...this.rowEntries().flatMap((entry) => (entry.entity ? [entry.entity] : [])),
+      ...this.controlEntries().flatMap((entry) => (entry.control ? [] : [entry.entity])),
+      ...this.quickActions().map((item) => item.entity),
       this.config?.image?.trim() === 'auto'
         ? this.devicePicture()
         : imageEntity(this.config?.image),
@@ -1507,7 +1306,7 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
     const words = this.view('address');
     const address =
       location?.state !== 'home' && words && words.status === 'ok' ? words.state.trim() : '';
-    const badge = ((): Reading['badge'] => {
+    const badge = ((): { readonly text: string; readonly tone: Tone } => {
       if (unavailable) return { text: this.t('state.unavailable'), tone: 'off' };
       if (charge === 'charging') {
         const watts = this.watts();
@@ -1536,6 +1335,7 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
         return { text: s(this.hass, 'plugged'), tone: charge === 'error' ? 'warning' : 'neutral' };
       return { text: s(this.hass, activity === 'asleep' ? 'asleep' : 'parked'), tone: 'neutral' };
     })();
+    const own = unavailable ? undefined : this.ownBadge();
     return {
       name: this.carName(),
       energy,
@@ -1553,14 +1353,30 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
         charge !== 'charging' &&
         lowRange(range.number, level, this.config?.low_range),
       open: unavailable ? null : this.opening(),
+      tyres: this.tyres(unavailable),
       cabin: climateOn || unavailable ? null : cabinOf(inside?.n ?? null, inside?.unit ?? '°C'),
       stale: this.stale(now),
       place,
       address,
       unavailable,
       tone: badge.tone,
-      badge,
+      badge: own === null ? null : own ? { text: own, tone: badge.tone, own: true } : badge,
     };
+  }
+
+  /**
+   * The person's own badge (`badge`, #251): its words, an entity's state, a template's answer; null while Home
+   * Assistant has not answered (no badge, rather than the card's for a moment); undefined where it says nothing — an
+   * empty answer, a template refused, an entity out of reach — and the card's own says what the car does.
+   */
+  private ownBadge(): string | null | undefined {
+    const asked = this.config?.badge;
+    const line = this.ownText(asked);
+    if (!line) return undefined;
+    if (line.text === PENDING_LINE) return null;
+    if (isEntityId(asked) && this.hass?.states[asked] && !isUsable(this.entity(asked)))
+      return undefined;
+    return line.text.trim() || undefined;
   }
 
   /** What stands open, a window first: its windows' cover or sensors, its doors, its boot, its front boot. */
@@ -1621,6 +1437,7 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
       low: r.low,
       open: r.open,
       cabin: r.cabin,
+      tyre: r.tyres.some((tyre) => tyre.low),
       ...(r.tank ? { tank: r.tank } : {}),
     });
     const words = (text: string, ink: Line['ink'] = '', short?: string): Line => ({
@@ -1684,6 +1501,9 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
         return words(s(this.hass, 'oil_check'), 'warning');
       case 'service':
         return words(s(this.hass, 'service_due'), 'warning');
+      case 'tyre':
+        // a line too short for it names the tyres alone, in the warning's ink
+        return words(s(this.hass, 'tyre_pressure_low'), 'warning', s(this.hass, 'tyres'));
       case 'open': {
         // an engine's car opens a bonnet where an electric one opens its front boot; a line too short for "Boot open"
         // names the part alone, in the warning's ink, as a car's own display does ("Багажник" at 152)
@@ -1744,7 +1564,11 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
   private controlEntries(): ControlEntry[] {
     const listed = this.config?.controls;
     if (Array.isArray(listed))
-      return listed.map(controlEntry).filter((e) => VEHICLE_CONTROLS.includes(e.control));
+      return listed
+        .map(controlEntry)
+        .filter((e) =>
+          e.control === undefined ? isEntityId(e.entity) : VEHICLE_CONTROLS.includes(e.control),
+        );
     return carControls(this.car()).map((control) => ({ control }));
   }
 
@@ -1762,9 +1586,9 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
    * Every word a control can say, whatever its state now: an opening's name and "Open", each of a lock's states, the
    * climate's off and on and a temperature at its widest, each of the charge's words, the sentry's name.
    */
-  private controlWords(entry: ControlEntry, name: string, shut: string): readonly string[] {
+  private controlWords(key: VehicleControl, name: string, shut: string): readonly string[] {
     const open = this.t('common.open');
-    switch (entry.control) {
+    switch (key) {
       case 'lock': {
         const v = this.view('lock');
         return v?.domain === 'lock'
@@ -1789,6 +1613,8 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
         );
       case 'windows':
         return [open, shut, s(this.hass, 'vented')];
+      case 'engine':
+        return [name, s(this.hass, 'engine_running'), this.t('common.off')];
       case 'sentry':
         return [name];
       default:
@@ -1798,16 +1624,17 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
 
   /** A control as it stands: its round, its word, what a tap does. */
   private control(entry: ControlEntry, r: Reading): ControlView {
+    const key = entry.control;
+    if (!key) return this.ownControl(entry);
     const { roles, doors, windows } = this.car();
-    const name = entry.name ?? this.t(controlWord(entry.control, r.energy));
+    const name = entry.name ?? this.t(controlWord(key, r.energy));
     /** What an opening says: its name while shut (the port's short one), "Open" while open (in the warning's ink). */
-    const shut = entry.name ?? (entry.control === 'charge_port' ? s(this.hass, 'port') : name);
+    const shut = entry.name ?? (key === 'charge_port' ? s(this.hass, 'port') : name);
     const opening = (isOpen: boolean): string => (isOpen ? this.t('common.open') : shut);
     const accent = this.accents.item(entry.color);
     const base = {
-      key: entry.control,
       name,
-      words: this.controlWords(entry, name, shut),
+      words: this.controlWords(key, name, shut),
       accent,
       entry,
       ink: '' as ControlView['ink'],
@@ -1843,7 +1670,7 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
         : v.domain === 'binary_sensor' || v.domain === 'switch'
           ? v.state === 'on'
           : /open|ajar/.test(v.state.toLowerCase());
-    switch (entry.control) {
+    switch (key) {
       case 'lock': {
         const v = this.view('lock');
         if (!v || v.status !== 'ok' || r.unavailable) return out('lock', v?.id);
@@ -1977,7 +1804,7 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
       case 'charge_port':
       case 'trunk':
       case 'frunk': {
-        const role = entry.control;
+        const role = key;
         const v = this.view(role);
         const closedGlyph = role === 'charge_port' ? 'chargePort' : role;
         if (!v || v.status !== 'ok' || r.unavailable) return out(closedGlyph, v?.id);
@@ -2056,6 +1883,25 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
           act: undefined,
         };
       }
+      case 'engine': {
+        // a switch starts it and stops it, a button starts it: each asks first, where its `confirm` does not say not to
+        const v = this.view('engine');
+        if (!v || !isUsable(v) || r.unavailable) return out('engine', v?.id);
+        const switched = v.domain === 'switch';
+        const running = switched && this.stateOf(v) === 'on';
+        const ask = (stop: boolean) =>
+          asks(true, s(this.hass, stop ? 'stop_engine_confirm' : 'start_engine_confirm'));
+        return {
+          ...base,
+          glyph: entry.icon ?? 'engine',
+          word: switched ? (running ? s(this.hass, 'engine_running') : this.t('common.off')) : name,
+          tone: running ? toned('accent') : 'neutral',
+          entity: v.id,
+          act: switched
+            ? service(v.id, running ? 'switch.turn_off' : 'switch.turn_on', ask(running))
+            : service(v.id, 'button.press', ask(false)),
+        };
+      }
       case 'sentry': {
         const v = this.view('sentry');
         if (!v || v.status !== 'ok' || r.unavailable) return out('shield', v?.id);
@@ -2072,6 +1918,76 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
         };
       }
     }
+  }
+
+  /**
+   * What the rounds reach of the card: its house, its names, its states as drawn, its calls and its colours; a tap on
+   * and off for what a person puts among its controls on purpose (a switch, a button, a script, a scene), as a room's
+   * quick actions take one.
+   */
+  private host(): RoundsHost {
+    return {
+      hass: this.hass,
+      toggles: TOGGLE_DOMAINS,
+      name: (view, own: EntityName | undefined) => this.nameFor(view, own),
+      state: (view) => this.stateOf(view),
+      expect: (id, state) => this.expect(id, state),
+      call: (domain, service, data) => this.call(domain, service, data, ''),
+      run: (action, entity) => this.tap(entity, action),
+      tapper: (of, at, tap, double) => this.tapper(of, at, tap, double),
+      accent: (colour) => this.accents.item(colour),
+      ruler: this.head.ruler,
+      root: this.renderRoot,
+    };
+  }
+
+  /**
+   * An entity of the person's own among the controls (#248), as every card draws its round (`roundOf`): its name, its
+   * glyph, lit in its tone (its colour) while on, the dashed circle out of reach; its tap — its own, else on and off
+   * where its kind takes one, else its details — asking first where `confirm` says so (never before its details open),
+   * its hold its details. In the car's cell, its name its word (cut to an ellipsis, as a name may be), which never
+   * widens the row: a row's cells are laid out by the car's own words.
+   */
+  private ownControl(entry: ControlEntry): ControlView {
+    const host = this.host();
+    const id = entry.entity ?? '';
+    const item: RoundSpec = {
+      group: 'entity',
+      entity: id,
+      ...(entry.name ? { name: entry.name } : {}),
+      ...(entry.icon ? { icon: entry.icon } : {}),
+      ...(entry.color ? { color: entry.color } : {}),
+      ...(entry.tap_action ? { tap_action: entry.tap_action } : {}),
+      ...(entry.hold_action ? { hold_action: entry.hold_action } : {}),
+      ...(entry.double_tap_action ? { double_tap_action: entry.double_tap_action } : {}),
+    };
+    const view = this.entity(id);
+    const tap = roundTap(host, item, view.domain);
+    const acts = tap.action !== 'more-info' && tap.action !== 'none';
+    const round = roundOf(
+      host,
+      acts && entry.confirm !== undefined
+        ? {
+            ...item,
+            tap_action: { ...tap, confirmation: entry.confirm && (tap.confirmation ?? true) },
+          }
+        : item,
+    );
+    return {
+      name: round.name,
+      glyph: round.glyph,
+      word: round.name,
+      words: [],
+      tone: !round.usable ? 'off' : round.on ? round.tone : 'neutral',
+      ink: '',
+      entity: view.id,
+      act: undefined,
+      disabled: !round.usable,
+      why: '',
+      accent: round.on ? round.accent : undefined,
+      entry,
+      own: { onTap: round.onTap, onHold: round.onHold, state: stateText(this.hass, view) },
+    };
   }
 
   /**
@@ -2143,8 +2059,15 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
 
   private renderControl(view: ControlView, bare: boolean): TemplateResult {
     const hold = view.entry.hold_action;
-    const onHold = (): void => this.hold(view.entity, hold ?? { action: 'more-info' });
-    const label = view.why ? `${said(view)} · ${view.why}` : said(view);
+    const { own } = view;
+    const onHold = own
+      ? own.onHold
+      : (): void => this.hold(view.entity, hold ?? { action: 'more-info' });
+    const label = own
+      ? `${view.name} · ${own.state}`
+      : view.why
+        ? `${said(view)} · ${view.why}`
+        : said(view);
     return html`<button
       class="vh-control"
       data-target
@@ -2153,27 +2076,63 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
       title=${label}
       aria-disabled=${view.disabled ? 'true' : nothing}
       ?disabled=${view.tone === 'off'}
-      .fvTap=${this.tapper(
-        view.entry.double_tap_action,
-        `control_${view.entry.control}`,
-        () => this.press(view),
-        this.runner(view.entry.double_tap_action, view.entity),
-      )}
+      .fvTap=${
+        own
+          ? own.onTap
+          : this.tapper(
+              view.entry.double_tap_action,
+              `control_${view.entry.control}`,
+              () => this.press(view),
+              this.runner(view.entry.double_tap_action, view.entity),
+            )
+      }
       .fvHold=${onHold as PressTarget['fvHold']}
       @pointerdown=${startPress}
       @contextmenu=${preventMenu}
       @click=${view.disabled ? (event: Event) => event.preventDefault() : clickPress}
-      @keydown=${holdKey(onHold)}
+      @keydown=${onHold ? holdKey(onHold) : nothing}
     >
       <span class="fv-ico fv-ico--${view.tone}">${icon(view.glyph, 'car')}</span>
       ${
         bare
           ? nothing
-          : html`<span class="vh-control__word ${view.ink ? `is-${view.ink}` : ''}"
-              >${view.word}</span
-            >`
+          : own
+            ? html`<span class="vh-control__word is-name" data-name>${view.word}</span>`
+            : html`<span class="vh-control__word ${view.ink ? `is-${view.ink}` : ''}"
+                >${view.word}</span
+              >`
       }
     </button>`;
+  }
+
+  /* ---------- the quick actions ---------- */
+
+  /** The quick actions the card lists (#251): an entity's rounds, a word it does not know left out. */
+  private quickActions(): RoundSpec[] {
+    const listed = this.config?.quick_actions;
+    return Array.isArray(listed) && this.variant !== 'mini'
+      ? roundsOf({ hass: this.hass }, listed)
+      : [];
+  }
+
+  /**
+   * The quick actions at the foot (#251), as a room's are drawn (`roundsIn`): 44 rounds 8 apart from the line's start,
+   * as many as it holds, those that do not giving way from the end; each lit in its tone while on, its tap and its
+   * hold, its state in a pill where asked (under its glyph, the line 64 tall, or beside it). The line keeps its place
+   * while none of them can be drawn: the card's height is its config's.
+   */
+  private renderQuick(): TemplateResult | typeof nothing {
+    const c = this.config;
+    if (!c || this.variant === 'mini' || !Array.isArray(c.quick_actions) || !c.quick_actions.length)
+      return nothing;
+    const look = { ...c, states: c.show_quick_states, beside: c.quick_state_position === 'beside' };
+    // the line starts at the column's edge: none of the 12 a room's rounds keep from what is before them
+    const { template } = roundsIn(
+      { ...this.host(), look },
+      this.quickActions(),
+      this.contentWidth + 12,
+    );
+    return html`<div class="vh-quick ${statesUnder(c) ? 'is-under' : ''}">${template}</div>`;
   }
 
   /* ---------- the rows ---------- */
@@ -2347,47 +2306,125 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
 
   /* ---------- the tyres ---------- */
 
+  /**
+   * The decimals every tyre is written in (one count for all four): the card's `tyre_decimals`, else their sensors'
+   * display precision where Home Assistant's registry gives one, else one where they read under 10 (a bar's 2.3), none
+   * above (a psi's 36, a kPa's 230).
+   */
+  private tyreDigits(views: readonly (EntityView | undefined)[]): number {
+    const precisions = views.flatMap((v) => {
+      const precision = v ? this.hass?.entities?.[v.id]?.display_precision : undefined;
+      return typeof precision === 'number' && Number.isFinite(precision) ? [precision] : [];
+    });
+    return this.digits(
+      this.config?.tyre_decimals,
+      precisions.length ? Math.max(...precisions) : this.tyreScale(views) < 10 ? 1 : 0,
+    );
+  }
+
+  /**
+   * The pressure under which a tyre is low (`tyre_low`, #251), and the unit it is said in where it says one: a figure
+   * in the tyres' unit, an entity's reading in its own, a template's answer in the tyres'; none where it cannot be read
+   * (a template Home Assistant has not answered yet). The one place it is read.
+   */
+  private tyreLow(): { readonly value: number; readonly unit: string } | null {
+    const own = this.config?.tyre_low;
+    if (typeof own === 'number') return Number.isFinite(own) ? { value: own, unit: '' } : null;
+    if (isEntityId(own)) {
+      this.follows(own);
+      const v = this.entity(own);
+      return v.status === 'ok' && v.number !== null ? { value: v.number, unit: v.unit } : null;
+    }
+    const text = (this.ownText(own, false)?.text ?? '').trim().replace(',', '.');
+    const value = Number(text);
+    return text && Number.isFinite(value) ? { value, unit: '' } : null;
+  }
+
+  /** How large the tyres' figures run: their highest reading, else (out of reach) a car's usual 3 bar in their unit. */
+  private tyreScale(views: readonly (EntityView | undefined)[]): number {
+    const read = views.flatMap((v) => (v?.status === 'ok' && v.number !== null ? [v.number] : []));
+    return read.length
+      ? Math.max(...read.map(Math.abs))
+      : convertPressure(3, 'bar', views.find((v) => v?.unit)?.unit ?? 'bar');
+  }
+
+  /**
+   * The four tyres, front left to rear right: each one's pressure, all four in the same decimals (`tyreDigits`), or
+   * where it has none what its warning says; low where its integration's warning is on (or its warning of every
+   * tyre), or where it reads under `tyre_low` (said in another unit of pressure, brought to the tyre's).
+   */
+  private tyres(unavailable: boolean): Tyre[] {
+    const { warnings } = this.car();
+    const on = (id: string | undefined): boolean => Boolean(id) && this.entity(id).state === 'on';
+    const all = on(warnings.all);
+    const views = WHEELS.map((wheel) => this.view(`tyre_${wheel}`));
+    const decimals = this.tyreDigits(views);
+    const under = this.tyreLow();
+    return WHEELS.map((wheel, index) => {
+      const v = views[index];
+      const read = v?.status === 'ok' && !unavailable ? v.number : null;
+      const low =
+        !unavailable &&
+        (on(warnings[wheel]) ||
+          all ||
+          (read !== null &&
+            under !== null &&
+            read < convertPressure(under.value, under.unit || (v?.unit ?? ''), v?.unit ?? '')));
+      // a tyre with no pressure of its own says what its warning says
+      const value =
+        read !== null
+          ? formatNumber(this.hass, read, { digits: decimals, minDigits: decimals })
+          : !v && warnings[wheel]
+            ? s(this.hass, low ? 'tyre_low' : 'tyre_ok')
+            : '—';
+      return {
+        wheel,
+        value,
+        unit: read !== null && v ? v.unit : '',
+        low,
+        id: v?.id ?? warnings[wheel],
+      };
+    });
+  }
+
   private renderTyres(r: Reading): TemplateResult | typeof nothing {
     if (this.config?.show_tyres !== true || this.variant !== 'full') return nothing;
-    const { warnings } = this.car();
-    const all = warnings.all ? this.entity(warnings.all).state === 'on' : false;
-    const wheels: readonly Wheel[] = ['fl', 'fr', 'rl', 'rr'];
-    const low: Partial<Record<Wheel, boolean>> = {};
-    const tyre = (wheel: Wheel) => {
-      const v = this.view(`tyre_${wheel}`);
-      const flag = warnings[wheel] ? this.entity(warnings[wheel]).state === 'on' : false;
-      low[wheel] = !r.unavailable && (flag || all);
-      const ok = v && v.status === 'ok' && v.number !== null && !r.unavailable;
-      // a tyre with no pressure of its own says what its warning says
-      const value = ok
-        ? this.figure(v.number as number, /bar$/i.test(v.unit) ? 1 : 0)
-        : !v && warnings[wheel]
-          ? low[wheel]
-            ? s(this.hass, 'tyre_low')
-            : s(this.hass, 'tyre_ok')
-          : '—';
-      return { wheel, value, unit: ok ? v.unit : '', id: v?.id ?? warnings[wheel] };
-    };
-    const tyres = wheels.map(tyre);
-    // the car from above gives way where a column would not hold the widest pressure beside it
+    const { tyres } = r;
+    // the car from above gives way where a column would not hold the widest pressure beside it: the widest its
+    // figures run to, in their decimals and their unit, whatever they read now
+    const views = WHEELS.map((wheel) => this.view(`tyre_${wheel}`));
+    const decimals = this.tyreDigits(views);
+    const whole = String(Math.trunc(this.tyreScale(views))).length;
+    const sample = formatNumber(this.hass, Number(`${'8'.repeat(whole)}.${'8'.repeat(decimals)}`), {
+      digits: decimals,
+      minDigits: decimals,
+    });
     const widest = Math.max(
       ...tyres.map((t) => this.head.ruler.width('vh-tyre', t.value, 'fv-unit', t.unit)),
-      this.head.ruler.width('vh-tyre', '8.8', 'fv-unit', 'bar'),
+      this.head.ruler.width(
+        'vh-tyre',
+        sample,
+        'fv-unit',
+        views.find((v) => v?.unit)?.unit ?? 'bar',
+      ),
     );
     const bare = (this.contentWidth - 32 - CAR_WIDTH - 24) / 2 < widest;
-    const label = (t: (typeof tyres)[number]): string =>
+    // …then, where two columns would not hold it either (half a section), each unit goes under its figure
+    const stacked = bare && (this.contentWidth - 32 - 12) / 2 < widest;
+    const low = Object.fromEntries(tyres.map((t) => [t.wheel, t.low]));
+    const label = (t: Tyre): string =>
       `${s(this.hass, `tyre_${t.wheel}`)} · ${t.value}${t.unit ? ` ${t.unit}` : ''}`;
     return html`<div
-      class="vh-tyres ${bare ? 'is-bare' : ''}"
+      class="vh-tyres ${bare ? 'is-bare' : ''} ${stacked ? 'is-stacked' : ''}"
       role="group"
       aria-label=${s(this.hass, 'tyres')}
-      @click=${() => this.tap(tyres.find((t) => low[t.wheel])?.id ?? tyres[0]?.id, { action: 'more-info' })}
+      @click=${() => this.tap(tyres.find((t) => t.low)?.id ?? tyres[0]?.id, { action: 'more-info' })}
     >
       ${bare ? nothing : carFromAbove(low)}
       ${tyres.map(
         (t, index) =>
           html`<span
-            class="vh-tyre ${index % 2 ? '' : 'is-left'} ${low[t.wheel] ? 'is-low' : ''}"
+            class="vh-tyre ${index % 2 ? '' : 'is-left'} ${t.low ? 'is-low' : ''}"
             style="grid-row:${index < 2 ? 1 : 2};grid-column:${bare ? (index % 2) + 1 : index % 2 ? 3 : 1}"
             aria-label=${label(t)}
             >${t.value}${t.unit ? html`<span class="fv-unit">${t.unit}</span>` : nothing}</span
@@ -2423,12 +2460,20 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
     );
   }
 
-  private picture(lead: boolean): TemplateResult {
+  /**
+   * The car's picture: in the head, or over the battery at its size (`image_size`, #254) — there the card's button
+   * where the head is hidden (`press`: its tap and hold), named by the car.
+   */
+  private picture(lead: boolean, press?: Press, name = ''): TemplateResult {
     const src = this.pictures.shown(this.pictureSrc());
+    const plate = lead || !this.config ? null : picturePlate(this.config, this.contentWidth);
+    const cover =
+      press?.onTap || press?.onHold ? pressCover(name, press.onTap, press.onHold) : nothing;
     return html`<span
       class="${lead ? 'vh-face' : 'vh-picture'} ${src ? '' : 'is-empty'}"
-      aria-hidden="true"
-      >${src ? html`<img src=${src} alt="" @error=${this.pictures.failed} />` : glyph('car')}</span
+      style=${plate ? `width:${plate.width}px;height:${plate.height}px` : nothing}
+      aria-hidden=${cover === nothing ? 'true' : nothing}
+      >${src ? html`<img src=${src} alt="" @error=${this.pictures.failed} />` : glyph('car')}${cover}</span
     >`;
   }
 
@@ -2444,12 +2489,23 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
     this.timed = r.charge === 'charging' || Boolean(r.stale) || Boolean(this.view('updated'));
     if (this.variant === 'mini') return this.renderMini(r);
     const at = c ? pictureAt(c) : null;
+    // the head and the battery as the config shows them (#254): the picture is the card's button where the head is not
+    const headed = c?.show_head !== false;
     return html`<article class="fv-card vh-card ${r.unavailable ? 'is-unavailable' : ''}" data-card>
-      ${this.renderHead(r, at === 'head')}
-      ${at === 'hero' && this.variant === 'full' ? this.picture(false) : nothing}
-      ${this.renderHeroes(r)} ${this.renderLine(r, now)}
+      ${headed ? this.renderHead(r, at === 'head') : nothing}
+      ${
+        at === 'hero' && this.variant === 'full'
+          ? this.picture(
+              false,
+              headed ? undefined : this.headActions(this.leadEntity(r) ?? c?.entity),
+              r.name,
+            )
+          : nothing
+      }
+      ${c?.show_hero !== false ? this.renderHeroes(r) : nothing} ${this.renderLine(r, now)}
       ${this.renderControls(r, this.variant === 'compact')}
       ${this.variant === 'full' ? html`${this.renderRows(r)}${this.renderTyres(r)}` : nothing}
+      ${this.renderQuick()}
     </article>`;
   }
 
@@ -2713,7 +2769,7 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
     // out of reach, the line says so alone, as a small tile does (the dash where the word would not hold); a hybrid
     // says its tank after its charge, and how far it goes on both
     const segments: Segment[] = r.unavailable
-      ? [{ text: r.badge.text, short: '—' }]
+      ? [{ text: this.t('state.unavailable'), short: '—' }]
       : [
           { text: level === null && !gauge.amount ? '—' : this.gaugeText(gauge) },
           ...(tank
@@ -2730,7 +2786,7 @@ export class FluvyVehicleCard extends Card<VehicleCardConfig> {
           ...(this.config?.show_range !== false && reach.number !== null
             ? [{ text: `${reach.value} ${reach.unit}`, optional: true }]
             : []),
-          { text: r.badge.text, optional: true },
+          ...(r.badge ? [{ text: r.badge.text, optional: true }] : []),
           ...(r.place ? [{ text: r.place, optional: true }] : []),
         ];
     const line = fitLine(segments, room, (text) => this.head.ruler.width('fv-row__sub', text));
