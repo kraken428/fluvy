@@ -426,7 +426,7 @@ export const HA_GROUPS: readonly HaGroup[] = [
       ['--app-theme-color', c.surface.card],
       // on a surface read by its edges the header is the page's colour: the edge runs under it
       ...(c.line ? ([['--app-header-border-bottom', `1px solid ${c.line.edge}`]] as const) : []),
-      ['--sidebar-background-color', c.surface.card],
+      ['--sidebar-background-color', 'transparent'],
       ['--sidebar-text-color', c.text.primary],
       ['--sidebar-icon-color', c.text.secondary],
       // the selected item sits on the accent's fill (the shell's pill)
