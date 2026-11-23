@@ -1,0 +1,62 @@
+name: Publish HACS package
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fluvy-hacs-publish
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Build, validate, and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Identify release version
+        id: version
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build frontend
+        run: pnpm build
+      - name: Validate compiled release
+        run: node tools/release/check.mjs --release
+      - name: Create HACS ZIP
+        run: |
+          (cd custom_components/fluvy && zip -r -X ../../fluvy.zip . -x '__pycache__/*' -x '*/__pycache__/*')
+          for file in manifest.json frontend/manifest.json frontend/fluvy.js frontend/loader.js; do
+            unzip -Z1 fluvy.zip | grep -Fxq "$file" || { echo "::error::Missing $file in HACS ZIP"; exit 1; }
+          done
+          unzip -p fluvy.zip frontend/manifest.json | node -e '
+            let data = "";
+            process.stdin.on("data", chunk => data += chunk);
+            process.stdin.on("end", () => {
+              const manifest = JSON.parse(data);
+              if (typeof manifest.version !== "string" || typeof manifest.build !== "string") process.exit(1);
+            });
+          '
+      - name: Publish only if this version has no release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists. Not overwriting an existing version."
+            exit 0
+          fi
+          gh release create "$TAG" fluvy.zip --target "$GITHUB_SHA" --title "$TAG" --generate-notes
